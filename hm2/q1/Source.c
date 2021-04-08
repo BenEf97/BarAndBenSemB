@@ -40,4 +40,6 @@ typedef struct Node
 	};
 }Node;
 
+void AddNodeToEnd(Node* nodePtr,Trip* tripPtr) {
 
+}
