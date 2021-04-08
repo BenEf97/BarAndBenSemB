@@ -11,8 +11,6 @@ int numOfShows(char* arr[], int size, char tav) {
 	} while (i != NULL);
 	count += numOfShows(arr, size - 1, tav);
 	return count;
-
-
 }
 
 void main() {

@@ -2,17 +2,18 @@
 #define TRUE 1
 #define FALSE 0
 
-
-int switchNum(int num) {
-	if (num / 10 == 0) return TRUE;
-	if ((num % 2 == 0 && ((num / 10) % 2) - 1 == 0) || ((num % 2) - 1 == 0 && ((num / 10) % 2) == 0))
-		return switchNum(num / 10);
-	else return FALSE;
+int straightFlush(int arr[], int size, int num) {
+	if (size == 0 && num <= 0)return TRUE;
+	if (size == 0 && num > 0) return FALSE;
+	if (arr[size - 1] == num) {
+		return straightFlush(arr, size - 1, num - 1);
+	}
+	else return straightFlush(arr, size - 1, num);
 }
 
 void main() {
-	int num = 1414;
-	int chk = switchNum(num);
-	if (chk) printf("the number is a 'switcher'\n");
-	else printf("the number is not a 'switcher'\n");
+	int arr[] = { 7,1,1,2,3,5,1 };
+	int size = 7, num = 3;
+	if (straightFlush(arr, size, num)) printf("there is a straight flush in the array\n");
+	else printf("there isn't a straight flush in the array\n");
 }

@@ -1,14 +1,19 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
-
+#define SIZE 20
 int sameCharAndIdx(char* str1, char* str2);
 
 void main() {
-	char str1[] = { "aBdRe" };
-	char str2[] = { "ASdRle" };
-	printf("number of same characters in the same place is: %d\n", sameCharAndIdx(&str1, &str2));
+	//char str1[] = { "aBdRe" };
+	//char str2[] = { "ASdRle" };
+	char str1[SIZE];
+	char str2[SIZE];
+	printf("Please enter up to %d letter string: ", SIZE);
+	gets(str1);
+	printf("Please enter another up to %d letter string: ", SIZE);
+	gets(str2);
+	printf("Number of same characters in the same place is: %d\n", sameCharAndIdx(&str1, &str2));
 }
 
 int sameCharAndIdx(char* str1, char* str2) {

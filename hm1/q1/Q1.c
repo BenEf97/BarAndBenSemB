@@ -11,8 +11,8 @@ int switchNum(int num) {
 }
 
 void main() {
-	int num = 1414;
+	int num = 163789;
 	int chk = switchNum(num);
-	if (chk) printf("the number is a 'switcher'\n");
-	else printf("the number is not a 'switcher'\n");
+	if (chk) printf("The number is a 'switcher'\n");
+	else printf("The number is not a 'switcher'\n");
 }
