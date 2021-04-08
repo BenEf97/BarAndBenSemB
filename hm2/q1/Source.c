@@ -42,7 +42,7 @@ void memoryFail()
 
 Node* AddNodeToEnd(Node* list,Trip* tripPtr) {
 	Node* ptr = list;
-
+	int tripCount=1;
 	//Memory allocation
 	Node* newNode = (Node*)calloc(1, sizeof(Node));
 	if (newNode == NULL)
@@ -53,12 +53,17 @@ Node* AddNodeToEnd(Node* list,Trip* tripPtr) {
 	//If the list is empty, the type is 0 because of calloc
 	if (list == NULL)
 	{
+		newNode->trip->numTrip = 1;
 		return newNode;
 	}
 	//For double type list
 	if (ptr->type)
 	{
-		for (; ptr->listType->DoubleType->nextDouble != NULL; ptr = ptr->listType->DoubleType->nextDouble);
+		for (; ptr->listType->DoubleType->nextDouble != NULL; ptr = ptr->listType->DoubleType->nextDouble,tripCount++);
+		
+		newNode->trip->numTrip = tripCount;
+		newNode->type = 1;
+		newNode->listType->DoubleType->prev = ptr;
 		ptr->listType->DoubleType->nextDouble = newNode;
 		return list;
 	}
@@ -66,7 +71,8 @@ Node* AddNodeToEnd(Node* list,Trip* tripPtr) {
 	//For single type list
 	else
 	{
-		for (; ptr->listType->nextSingle != NULL; ptr = ptr->listType->nextSingle);
+		for (; ptr->listType->nextSingle != NULL; ptr = ptr->listType->nextSingle,tripCount++);
+		newNode->trip->numTrip=tripCount;
 		ptr->listType->nextSingle = newNode;
 		return list;
 	}
@@ -85,7 +91,3 @@ Trip* createTrip()
 	fseek(stdin, 0, SEEK_END);
 	
 }
-
-int tripNumSearch()
-
-
