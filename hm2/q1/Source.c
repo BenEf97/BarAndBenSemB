@@ -3,7 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 #define SIZE 80
-
+#define TRUE 1
+#define FALSE 0
 
 typedef struct
 {
@@ -89,5 +90,121 @@ Trip* createTrip()
 	printf("Please enter date in DD/MM/YY format: ");
 	scanf("%d/%d/%d", newTrip->dateTrip.day, newTrip->dateTrip.month, newTrip->dateTrip.year);
 	fseek(stdin, 0, SEEK_END);
-	
+}
+
+int dateCheck(Date dateInput, Date dateList)
+{
+	if (dateInput.day == dateList.day) {
+		if (dateInput.month == dateList.month) {
+			if (dateInput.year == dateList.year){
+				return TRUE;
+			}
+		}
+	}
+	return FALSE;
+}
+void numTripUpdate(Node* listPtr)
+{
+	Node *temp = listPtr;
+	while (temp != NULL)
+	{
+		temp->trip->numTrip--;
+		if (!temp->type)
+		temp = temp->listType->nextSingle;
+		else temp = temp->listType->DoubleType->nextDouble;
+	}
+}
+
+void deleteNode(Node* list, Date date)
+{
+	Node *ptr = list;
+	Node *temp = NULL;
+	//if list is empty
+	if (list == NULL)
+	{
+		printf("The list is empty!\n");
+		return;
+	}
+	//for single
+	if (!list->type) {
+
+		//delete first and update the list head
+		while (dateCheck(date, list->trip->dateTrip))
+		{
+			temp = list;
+			list = temp->listType->nextSingle;
+			numTripUpdate(list);
+			free(temp->trip);
+			free(temp);
+		}
+
+		//delete middle and last
+		while (ptr->listType->nextSingle != NULL)
+		{
+			//delete last
+			if (ptr->listType->nextSingle->listType->nextSingle == NULL)
+			{
+				free(ptr->listType->nextSingle->trip);
+				free(ptr->listType->nextSingle);
+				ptr->listType->nextSingle = NULL;
+				break;
+			}
+
+			//found a matching date in the middle
+			if (dateCheck(date, ptr->listType->nextSingle->trip->dateTrip))
+			{
+				temp = ptr->listType->nextSingle;
+				ptr->listType->nextSingle = temp->listType->nextSingle;
+				free(temp->trip);
+				free(temp);
+				numTripUpdate(ptr->listType->nextSingle);
+			}
+			ptr = ptr->listType->nextSingle;
+		}
+	}
+
+	//for double
+	//might be more than one
+	else {
+		//delete first and update the list head
+		while (dateCheck(date, list->trip->dateTrip))
+		{
+			temp = list;
+			list = temp->listType->DoubleType->nextDouble;
+			list->listType->DoubleType->prev = NULL;
+			numTripUpdate(list);
+			free(temp->trip);
+			free(temp);
+		}
+		while (ptr != NULL)
+		{
+			////delete last
+			//if (ptr->listType->nextSingle->listType->nextSingle == NULL)
+			//{
+			//	free(ptr->listType->nextSingle->trip);
+			//	free(ptr->listType->nextSingle);
+			//	ptr->listType->nextSingle = NULL;
+			//	break;
+			//}
+
+			//found a matching date in the middle
+			if (dateCheck(date, ptr->trip->dateTrip))
+			{
+				temp = ptr;
+				if (ptr->listType->DoubleType->nextDouble == NULL)
+				{
+					ptr->listType->DoubleType->prev->listType->DoubleType->nextDouble = temp->listType->DoubleType->nextDouble;
+				}
+				else
+				{
+					ptr->listType->DoubleType->prev->listType->DoubleType->nextDouble = temp->listType->DoubleType->nextDouble;
+					ptr->listType->DoubleType->nextDouble->listType->DoubleType->prev = ptr->listType->DoubleType->prev;
+					numTripUpdate(ptr->listType->DoubleType->nextDouble);
+				}
+				free(temp->trip);
+				free(temp);
+			}
+			ptr = ptr->listType->DoubleType->nextDouble;
+		}
+	}
 }
