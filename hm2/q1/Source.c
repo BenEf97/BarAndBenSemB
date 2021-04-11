@@ -222,27 +222,37 @@ Node *deleteNode(Node* list, Date date)
 }
 
 //need to fix
-void revese(Node* list)
+Node* revese(Node* list)
 {
+	if(list==NULL)
+	{
+		printf("The list is empty!\n");
+		return;
+	}
 	//Check if single way
 	if (!list->type)
 	{
-		Node *prev=NULL,*next,*ptr;
-		ptr=list; //0
+		Node *ptr = list, *nextmp = NULL, *ptrtmp;
 		
 		//revesing the pointers
 		while (ptr!=NULL)
 		{
-			next=ptr->listType.nextSingle; //1	2 3 NULL
-			ptr->listType.nextSingle=prev; //NULL	0 1 2
-			prev=ptr; //0	1 2 3
-			ptr=next; //1	2 3 NULL
+			ptrtmp = ptr->listType.nextSingle;
+			ptr->listType.nextSingle = nextmp;
+			nextmp = ptr;
+			ptr = ptrtmp;
+			//next=ptr->listType.nextSingle; //1	2 3 NULL			old reverse
+			//ptr->listType.nextSingle=prev; //NULL	0 1 2
+			//prev=ptr; //0	1 2 3
+			//ptr=next; //1	2 3 NULL
 		}
+		list = nextmp;
+		return list;
 	}
 	else printf("The list is double wayed.\n");
 }
 
-void freeItems(Node* list)
+Node* freeItems(Node* list)
 {
 	Node* ptr = list,*temp;
 	if (list == NULL)
@@ -268,6 +278,7 @@ void freeItems(Node* list)
 			ptr = temp;
 		}
 	}
+	return NULL;
 }
 
 void printList(Node* list) {
@@ -310,7 +321,7 @@ void main()
 			continue;
 		case '3':
 			printf("**Reverse**\n");
-			revese(head);
+			head = revese(head);
 			continue;
 		case '4':
 			printf("**Print List**\n");
@@ -318,7 +329,7 @@ void main()
 			continue;
 		case '5':
 			printf("**Delete List**\n");
-			freeItems(head);
+			head = freeItems(head);
 			continue;
 		case '6':
 			printf("Quiting the program...\n");
