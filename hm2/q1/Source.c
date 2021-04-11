@@ -208,3 +208,24 @@ void deleteNode(Node* list, Date date)
 		}
 	}
 }
+
+
+void revese(Node* list)
+{
+	//Check if single way
+	if (!list->type)
+	{
+		Node *prev=NULL,*next,*ptr;
+		ptr=list; //0
+		
+		//revesing the pointers
+		while (ptr!=NULL)
+		{
+			next=ptr->listType->nextSingle; //1	2 3 NULL
+			ptr->listType->nextSingle=prev; //NULL	0 1 2
+			prev=ptr; //0	1 2 3
+			ptr=next; //1	2 3 NULL
+		}
+	}
+	else printf("The list is double wayed.\n");
+}
