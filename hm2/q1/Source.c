@@ -138,6 +138,7 @@ void freeNode(Node* ptr)
 	free(ptr);
 }
 
+//to do: fix delete single last, fix both first and last on double
 Node *deleteNode(Node* list, Date date)
 {
 	Node *ptr;
@@ -220,7 +221,7 @@ Node *deleteNode(Node* list, Date date)
 	return list;
 }
 
-
+//need to fix
 void revese(Node* list)
 {
 	//Check if single way
