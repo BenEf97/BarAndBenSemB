@@ -115,6 +115,12 @@ void numTripUpdate(Node* listPtr)
 	}
 }
 
+void freeNode(Node* ptr)
+{
+	free(ptr->trip);
+	free(ptr);
+}
+
 void deleteNode(Node* list, Date date)
 {
 	Node *ptr = list;
@@ -134,8 +140,7 @@ void deleteNode(Node* list, Date date)
 			temp = list;
 			list = temp->listType->nextSingle;
 			numTripUpdate(list);
-			free(temp->trip);
-			free(temp);
+			freeNode(temp);
 		}
 
 		//delete middle and last
@@ -144,8 +149,7 @@ void deleteNode(Node* list, Date date)
 			//delete last
 			if (ptr->listType->nextSingle->listType->nextSingle == NULL)
 			{
-				free(ptr->listType->nextSingle->trip);
-				free(ptr->listType->nextSingle);
+				freeNode(ptr->listType->nextSingle);
 				ptr->listType->nextSingle = NULL;
 				break;
 			}
@@ -155,8 +159,7 @@ void deleteNode(Node* list, Date date)
 			{
 				temp = ptr->listType->nextSingle;
 				ptr->listType->nextSingle = temp->listType->nextSingle;
-				free(temp->trip);
-				free(temp);
+				freeNode(temp);
 				numTripUpdate(ptr->listType->nextSingle);
 			}
 			ptr = ptr->listType->nextSingle;
@@ -173,20 +176,10 @@ void deleteNode(Node* list, Date date)
 			list = temp->listType->DoubleType->nextDouble;
 			list->listType->DoubleType->prev = NULL;
 			numTripUpdate(list);
-			free(temp->trip);
-			free(temp);
+			freeNode(temp);
 		}
 		while (ptr != NULL)
 		{
-			////delete last
-			//if (ptr->listType->nextSingle->listType->nextSingle == NULL)
-			//{
-			//	free(ptr->listType->nextSingle->trip);
-			//	free(ptr->listType->nextSingle);
-			//	ptr->listType->nextSingle = NULL;
-			//	break;
-			//}
-
 			//found a matching date in the middle
 			if (dateCheck(date, ptr->trip->dateTrip))
 			{
@@ -201,8 +194,7 @@ void deleteNode(Node* list, Date date)
 					ptr->listType->DoubleType->nextDouble->listType->DoubleType->prev = ptr->listType->DoubleType->prev;
 					numTripUpdate(ptr->listType->DoubleType->nextDouble);
 				}
-				free(temp->trip);
-				free(temp);
+				freeNode(temp);
 			}
 			ptr = ptr->listType->DoubleType->nextDouble;
 		}
@@ -229,3 +221,101 @@ void revese(Node* list)
 	}
 	else printf("The list is double wayed.\n");
 }
+
+void freeItems(Node* list)
+{
+	Node* ptr = list,*temp;
+	if (list == NULL)
+	{
+		printf("The list is empty.\n");
+		return;
+	}
+	//signle type
+	if (!list->type) {
+		while (ptr != NULL)
+		{
+			temp = ptr->listType->nextSingle;
+			freeNode(ptr);
+			ptr = temp;
+		}
+	}
+	//double type
+	else {
+		while (ptr != NULL)
+		{
+			temp = ptr->listType->DoubleType->nextDouble;
+			freeNode(ptr);
+			ptr = temp;
+		}
+	}
+}
+
+void printList(Node* list) {
+	Node* ptr = list;
+	if (list == NULL)
+	{
+		printf("The list is empty.\n");
+		return;
+	}
+	(list->type) ? printf("\tDouble list:\n") : printf("\tSingle list:\n");
+	while (ptr != NULL)
+	{
+		printf("Trip No. %d\n", ptr->trip->numTrip);
+		printf("Destination: %s\n", ptr->trip->destination);
+		printf("Date: %d/%d/%d\n", ptr->trip->dateTrip.day, ptr->trip->dateTrip.month, ptr->trip->dateTrip.year);
+		if (!list->type) ptr = ptr->listType->nextSingle;
+		else ptr = ptr->listType->DoubleType->nextDouble;
+	}
+}
+
+Date dateInput()
+{
+	Date temp;
+	printf("Please enter date to remove: ");
+	scanf("%d/%d/%d", &temp.day, &temp.month, &temp.year);
+	return temp;
+}
+
+void main()
+{
+	Node* head = NULL;
+	char option;
+	printf("\t***Main Menue***\nPlease enter your action:\n1- Add New Node\n2- Delete Node\n3- Reverse List\n4- Print List \n5- Delete whole list\n6- Quit");
+	scanf("%c", option);
+	fseek(stdin, 0, SEEK_END);
+	while (1)
+	{
+		switch (option) {
+		case '1':
+			printf("**Add to End**\n");
+			head = AddNodeToEnd(head, createTrip());
+			continue;
+		case '2':
+			printf("**Delete Node**\n");
+			deleteNode(head, dateInput());
+			continue;
+		case '3':
+			printf("**Reverse**\n");
+			revese(head);
+			continue;
+		case '4':
+			printf("**Print List**\n");
+			printList(head);
+			continue;
+		case '5':
+			printf("**Delete List**\n");
+			freeItems(head);
+			continue;
+		case '6':
+			printf("Quiting the program...\n");
+			freeItems(head);
+			free(head);
+			exit(0);
+		default:
+			printf("Error! Invalid input. Try again!\n");
+			continue;
+		}
+	}
+}
+
+
