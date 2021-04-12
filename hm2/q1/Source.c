@@ -227,7 +227,7 @@ Node* revese(Node* list)
 	if(list==NULL)
 	{
 		printf("The list is empty!\n");
-		return;
+		return NULL;
 	}
 	//Check if single way
 	if (!list->type)
@@ -258,7 +258,7 @@ Node* freeItems(Node* list)
 	if (list == NULL)
 	{
 		printf("The list is empty.\n");
-		return;
+		return NULL;
 	}
 	//signle type
 	if (!list->type) {
