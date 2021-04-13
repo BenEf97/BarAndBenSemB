@@ -27,12 +27,12 @@ typedef struct Node
 	Trip* trip;
 	union
 	{
-		struct {
+		struct { //8 bytes
 			struct Node *prev;
 			struct Node *nextDouble;
 		}DoubleType;
 
-		struct Node *nextSingle;
+		struct Node *nextSingle; //4 bytes
 	}listType;
 }Node;
 
@@ -80,14 +80,15 @@ Node* AddNodeToEnd(Node* list,Trip* tripPtr) {
 	if (list == NULL)
 	{
 		newNode->trip->numTrip = 1;
-		//newNode->type = 0;
-
-		//Debug
+		newNode->type = 0;
+		/*
+		//Debug for Double way list
 		printf("What type of linked list would you like?\n0-Single/ 1-Double: ");
 		scanf("%d", &(newNode->type));
 		fseek(stdin, 0, SEEK_END);
 		return newNode;
 		//End of debug
+		*/
 	}
 	//Checking if the list is single wayed or double wayed
 	if (!list->type)
@@ -236,33 +237,6 @@ Node *deleteNode(Node* list, Date date)
 			ptr = ptr->listType.DoubleType.nextDouble;
 			if (!ptr) break;
 		}
-
-		//while (ptr != NULL)
-		//{
-
-		//	//found a matching date in the middle
-		//	if (dateCheck(date, ptr->trip->dateTrip))
-		//	{
-		//		temp = ptr;
-
-		//		//Checking if the the current node is the tail
-		//		if (ptr->listType.DoubleType.nextDouble == NULL)
-		//		{
-		//			ptr->listType.DoubleType.prev->listType.DoubleType.nextDouble = temp->listType.DoubleType.nextDouble;
-		//		}
-		//		else
-		//		{
-		//			/*ptr->listType.DoubleType.prev->listType.DoubleType.nextDouble = temp->listType.DoubleType.nextDouble;
-		//			ptr->listType.DoubleType.nextDouble->listType.DoubleType.prev = ptr->listType.DoubleType.prev;
-		//			numTripUpdate(ptr->listType.DoubleType.nextDouble);
-		//			*/
-
-		//		}
-		//		freeNode(temp);
-		//		result = TRUE;
-		//	}
-		//	ptr = ptr->listType.DoubleType.nextDouble;
-		//}
 	}
 	if (result) printf("All the trips at this date are deleted!\n");
 	else printf("The date is not found! Please try another date.\n");
