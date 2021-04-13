@@ -20,11 +20,12 @@ typedef struct
 	Date dateTrip;
 }Trip;
 
+//The sturct Node has 2 options for linked lists- single way or double.
 typedef struct Node
 {
 	int type;
 	Trip* trip;
-	union //Nodelist
+	union
 	{
 		struct {
 			struct Node *prev;
@@ -35,46 +36,63 @@ typedef struct Node
 	}listType;
 }Node;
 
+//In case of failed memory allocation
 void memoryFail()
 {
 	printf("Error! Out of memory!");
 	exit(1);
 }
 
+//Checks if the list is empty
+int emptyCheck(Node* list)
+{
+	if (list == NULL)
+	{
+		printf("The list is empty!\n");
+		return FALSE;
+	}
+	else return TRUE;
+}
+
+//Date input, assuming for valid input.
 Date dateInput()
 {
 	Date temp;
-	printf("Please enter date: ");
+	printf("Please enter a valid date: ");
 	scanf("%d/%d/%d", &temp.day, &temp.month, &temp.year);
 	fseek(stdin, 0, SEEK_END);
 	return temp;
 }
 
+//Adding a new node to the end of the list.
 Node* AddNodeToEnd(Node* list,Trip* tripPtr) {
 	Node* ptr = list;
 	int tripCount=1;
+
 	//Memory allocation
 	Node* newNode = (Node*)calloc(1, sizeof(Node));
 	if (newNode == NULL)
 		memoryFail();
 
 	newNode->trip = tripPtr;
-	//newNode->data->trip = tripPtr;
 
-	//If the list is empty, the type is 0 because of calloc
+	//If the list is empty
 	if (list == NULL)
 	{
 		newNode->trip->numTrip = 1;
 		newNode->type = 0;
 		return newNode;
 	}
+	//Checking if the list is single wayed or double wayed
 	if (!list->type)
 		newNode->type = 0;
 	else
 		newNode->type = 1;
+	
 	//For double type list
 	if (ptr->type)
 	{
+		//Getting to the last node, and counting the number of the trip
 		for (; ptr->listType.DoubleType->nextDouble != NULL; ptr = ptr->listType.DoubleType->nextDouble,tripCount++);
 		
 		newNode->trip->numTrip = tripCount++;
@@ -86,6 +104,7 @@ Node* AddNodeToEnd(Node* list,Trip* tripPtr) {
 	//For single type list
 	else
 	{
+		//Getting to the last node, and counting the number of the trip
 		for (; ptr->listType.nextSingle != NULL; ptr = ptr->listType.nextSingle,tripCount++);
 		tripCount++;
 		newNode->trip->numTrip=tripCount;
@@ -94,6 +113,7 @@ Node* AddNodeToEnd(Node* list,Trip* tripPtr) {
 	}
 }
 
+//Creating a new trip
 Trip* createTrip()
 {
 	Trip* newTrip = (Trip*)calloc(1, sizeof(Trip));
@@ -103,12 +123,11 @@ Trip* createTrip()
 	fseek(stdin, 0, SEEK_END);
 	gets(newTrip->destination);
 	newTrip->dateTrip = dateInput();
-	//printf("Please enter date in DD/MM/YY format: ");
-	//scanf("%d/%d/%d", &(newTrip->dateTrip.day), &(newTrip->dateTrip.month), &(newTrip->dateTrip.year));
 	fseek(stdin, 0, SEEK_END);
 	return newTrip;
 }
 
+//Checking for a matching date
 int dateCheck(Date dateInput, Date dateList)
 {
 	if (dateInput.day == dateList.day) {
@@ -120,6 +139,8 @@ int dateCheck(Date dateInput, Date dateList)
 	}
 	return FALSE;
 }
+
+//After deleting a node, the trip numbers are updated
 void numTripUpdate(Node* listPtr)
 {
 	Node *temp = listPtr;
@@ -132,23 +153,22 @@ void numTripUpdate(Node* listPtr)
 	}
 }
 
+//Freeing all the allocated memory
 void freeNode(Node* ptr)
 {
 	free(ptr->trip);
 	free(ptr);
 }
 
-//to do: fix delete single last, fix both first and last on double
+//Delete all the trips at the given date
 Node *deleteNode(Node* list, Date date)
 {
 	Node *ptr;
 	Node *temp = NULL;
+	int result = FALSE;
 	//if list is empty
-	if (list == NULL)
-	{
-		printf("The list is empty!\n");
-		return list;
-	}
+	if (!emptyCheck(list)) return list;
+	
 	//for single
 	if (!list->type) {
 
@@ -159,19 +179,13 @@ Node *deleteNode(Node* list, Date date)
 			list = temp->listType.nextSingle;
 			numTripUpdate(list);
 			freeNode(temp);
+			result = TRUE;
 		}
 		ptr = list;
+
 		//delete middle and last
 		while (ptr->listType.nextSingle != NULL)
 		{
-			//delete last
-			//if (ptr->listType.nextSingle->listType.nextSingle == NULL)
-			//{
-			//	freeNode(ptr->listType.nextSingle);
-			//	ptr->listType.nextSingle = NULL;
-			//	break;
-			//}
-
 			//found a matching date in the middle
 			if (dateCheck(date, ptr->listType.nextSingle->trip->dateTrip))
 			{
@@ -179,6 +193,7 @@ Node *deleteNode(Node* list, Date date)
 				ptr->listType.nextSingle = temp->listType.nextSingle;
 				freeNode(temp);
 				numTripUpdate(ptr->listType.nextSingle);
+				result = TRUE;
 			}
 			ptr = ptr->listType.nextSingle;
 			if (!ptr) break;
@@ -186,7 +201,6 @@ Node *deleteNode(Node* list, Date date)
 	}
 
 	//for double
-	//might be more than one
 	else {
 		//delete first and update the list head
 		while (dateCheck(date, list->trip->dateTrip))
@@ -196,6 +210,7 @@ Node *deleteNode(Node* list, Date date)
 			list->listType.DoubleType->prev = NULL;
 			numTripUpdate(list);
 			freeNode(temp);
+			result = TRUE;
 		}
 		ptr = list;
 		while (ptr != NULL)
@@ -204,6 +219,8 @@ Node *deleteNode(Node* list, Date date)
 			if (dateCheck(date, ptr->trip->dateTrip))
 			{
 				temp = ptr;
+
+				//Checking if the the current node is the tail
 				if (ptr->listType.DoubleType->nextDouble == NULL)
 				{
 					ptr->listType.DoubleType->prev->listType.DoubleType->nextDouble = temp->listType.DoubleType->nextDouble;
@@ -215,53 +232,69 @@ Node *deleteNode(Node* list, Date date)
 					numTripUpdate(ptr->listType.DoubleType->nextDouble);
 				}
 				freeNode(temp);
+				result = TRUE;
 			}
 			ptr = ptr->listType.DoubleType->nextDouble;
 		}
 	}
+	if (result) printf("All the trips at this date are deleted!\n");
+	else printf("The date is not found! Please try another date.\n");
 	return list;
 }
 
-//need to fix
+//Counting the ammount of trips
+int tripCounter(Node* list)
+{
+	Node* ptr = list;
+	int count = 0;
+	for (; ptr != NULL;ptr=ptr->listType.nextSingle,count++);
+	return count;
+}
+
+//Reversing the order of the nodes
 Node* revese(Node* list)
 {
-	if(list==NULL)
-	{
-		printf("The list is empty!\n");
-		return NULL;
-	}
+	if (!emptyCheck(list)) return NULL;
+
 	//Check if single way
 	if (!list->type)
 	{
 		Node *ptr = list, *nextmp = NULL, *ptrtmp;
-		
+
+		//testing the count
+		int tripNum = tripCounter(list);
+
+		printf("Reversing the list...\n");
 		//revesing the pointers
 		while (ptr!=NULL)
 		{
+			//Updating the new order
+			ptr->trip->numTrip = tripNum;
+
 			ptrtmp = ptr->listType.nextSingle;
 			ptr->listType.nextSingle = nextmp;
 			nextmp = ptr;
 			ptr = ptrtmp;
-			//next=ptr->listType.nextSingle; //1	2 3 NULL			old reverse
-			//ptr->listType.nextSingle=prev; //NULL	0 1 2
-			//prev=ptr; //0	1 2 3
-			//ptr=next; //1	2 3 NULL
+
+			//this is the test...Works!
+			tripNum--;
+
 		}
 		list = nextmp;
-		return list;
+		printf("The list is reveresed!\n");
 	}
 	else printf("The list is double wayed.\n");
+	return list;
 }
 
 Node* freeItems(Node* list)
 {
 	Node* ptr = list,*temp;
-	if (list == NULL)
-	{
-		printf("The list is empty.\n");
-		return NULL;
-	}
-	//signle type
+	if (!emptyCheck(list)) return NULL;
+	
+
+	printf("Freeing items...\n");
+	//single type
 	if (!list->type) {
 		while (ptr != NULL)
 		{
@@ -284,11 +317,8 @@ Node* freeItems(Node* list)
 
 void printList(Node* list) {
 	Node* ptr = list;
-	if (list == NULL)
-	{
-		printf("The list is empty.\n");
-		return;
-	}
+	if (!emptyCheck(list)) return;
+
 	(list->type) ? printf("\tDouble list:\n") : printf("\tSingle list:\n");
 	while (ptr != NULL)
 	{
