@@ -30,7 +30,7 @@ typedef struct Node
 		struct {
 			struct Node *prev;
 			struct Node *nextDouble;
-		}*DoubleType;
+		}DoubleType;
 
 		struct Node *nextSingle;
 	}listType;
@@ -93,11 +93,11 @@ Node* AddNodeToEnd(Node* list,Trip* tripPtr) {
 	if (ptr->type)
 	{
 		//Getting to the last node, and counting the number of the trip
-		for (; ptr->listType.DoubleType->nextDouble != NULL; ptr = ptr->listType.DoubleType->nextDouble,tripCount++);
+		for (; ptr->listType.DoubleType.nextDouble != NULL; ptr = ptr->listType.DoubleType.nextDouble,tripCount++);
 		
 		newNode->trip->numTrip = tripCount++;
-		newNode->listType.DoubleType->prev = ptr;
-		ptr->listType.DoubleType->nextDouble = newNode;
+		newNode->listType.DoubleType.prev = ptr;
+		ptr->listType.DoubleType.nextDouble = newNode;
 		return list;
 	}
 
@@ -149,7 +149,7 @@ void numTripUpdate(Node* listPtr)
 		temp->trip->numTrip--;
 		if (!temp->type)
 		temp = temp->listType.nextSingle;
-		else temp = temp->listType.DoubleType->nextDouble;
+		else temp = temp->listType.DoubleType.nextDouble;
 	}
 }
 
@@ -206,8 +206,8 @@ Node *deleteNode(Node* list, Date date)
 		while (dateCheck(date, list->trip->dateTrip))
 		{
 			temp = list;
-			list = temp->listType.DoubleType->nextDouble;
-			list->listType.DoubleType->prev = NULL;
+			list = temp->listType.DoubleType.nextDouble;
+			list->listType.DoubleType.prev = NULL;
 			numTripUpdate(list);
 			freeNode(temp);
 			result = TRUE;
@@ -221,20 +221,20 @@ Node *deleteNode(Node* list, Date date)
 				temp = ptr;
 
 				//Checking if the the current node is the tail
-				if (ptr->listType.DoubleType->nextDouble == NULL)
+				if (ptr->listType.DoubleType.nextDouble == NULL)
 				{
-					ptr->listType.DoubleType->prev->listType.DoubleType->nextDouble = temp->listType.DoubleType->nextDouble;
+					ptr->listType.DoubleType.prev->listType.DoubleType.nextDouble = temp->listType.DoubleType.nextDouble;
 				}
 				else
 				{
-					ptr->listType.DoubleType->prev->listType.DoubleType->nextDouble = temp->listType.DoubleType->nextDouble;
-					ptr->listType.DoubleType->nextDouble->listType.DoubleType->prev = ptr->listType.DoubleType->prev;
-					numTripUpdate(ptr->listType.DoubleType->nextDouble);
+					ptr->listType.DoubleType.prev->listType.DoubleType.nextDouble = temp->listType.DoubleType.nextDouble;
+					ptr->listType.DoubleType.nextDouble->listType.DoubleType.prev = ptr->listType.DoubleType.prev;
+					numTripUpdate(ptr->listType.DoubleType.nextDouble);
 				}
 				freeNode(temp);
 				result = TRUE;
 			}
-			ptr = ptr->listType.DoubleType->nextDouble;
+			ptr = ptr->listType.DoubleType.nextDouble;
 		}
 	}
 	if (result) printf("All the trips at this date are deleted!\n");
@@ -307,7 +307,7 @@ Node* freeItems(Node* list)
 	else {
 		while (ptr != NULL)
 		{
-			temp = ptr->listType.DoubleType->nextDouble;
+			temp = ptr->listType.DoubleType.nextDouble;
 			freeNode(ptr);
 			ptr = temp;
 		}
@@ -326,7 +326,7 @@ void printList(Node* list) {
 		printf("Destination: %s\n", ptr->trip->destination);
 		printf("Date: %d/%d/%d\n", ptr->trip->dateTrip.day, ptr->trip->dateTrip.month, ptr->trip->dateTrip.year);
 		if (!list->type) ptr = ptr->listType.nextSingle;
-		else ptr = ptr->listType.DoubleType->nextDouble;
+		else ptr = ptr->listType.DoubleType.nextDouble;
 	}
 }
 
