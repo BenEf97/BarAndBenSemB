@@ -181,6 +181,7 @@ Node *deleteNode(Node* list, Date date)
 				numTripUpdate(ptr->listType.nextSingle);
 			}
 			ptr = ptr->listType.nextSingle;
+			if (!ptr) break;
 		}
 	}
 
