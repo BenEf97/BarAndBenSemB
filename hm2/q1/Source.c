@@ -20,6 +20,7 @@ typedef struct
 	Date dateTrip;
 }Trip;
 
+//***Q1***
 //The sturct Node has 2 options for linked lists- single way or double.
 typedef struct Node
 {
@@ -64,6 +65,7 @@ Date dateInput()
 	return temp;
 }
 
+//***Q2***
 //Adding a new node to the end of the list.
 Node* AddNodeToEnd(Node* list,Trip* tripPtr) {
 	Node* ptr = list;
@@ -168,6 +170,7 @@ void freeNode(Node* ptr)
 	free(ptr);
 }
 
+//***Q3**
 //Delete all the trips at the given date
 Node *deleteNode(Node* list, Date date)
 {
@@ -253,6 +256,8 @@ int tripCounter(Node* list)
 	return count;
 }
 
+
+//***Q4***
 //Reversing the order of the nodes
 Node* revese(Node* list)
 {
@@ -289,6 +294,8 @@ Node* revese(Node* list)
 	return list;
 }
 
+//***Q5***
+//Free all the items and memory
 Node* freeItems(Node* list)
 {
 	Node* ptr = list,*temp;
@@ -317,6 +324,8 @@ Node* freeItems(Node* list)
 	return NULL;
 }
 
+//***Q6***
+//Prints all the details
 void printList(Node* list) {
 	Node* ptr = list;
 	if (!emptyCheck(list)) return;
@@ -333,6 +342,8 @@ void printList(Node* list) {
 }
 
 
+//***Q7***
+//Main function, gives menu for user
 void main()
 {
 	Node* head = NULL;
@@ -375,5 +386,3 @@ void main()
 		}
 	}
 }
-
-
