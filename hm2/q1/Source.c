@@ -86,9 +86,10 @@ Node* AddNodeToEnd(Node* list,Trip* tripPtr) {
 		printf("What type of linked list would you like?\n0-Single/ 1-Double: ");
 		scanf("%d", &(newNode->type));
 		fseek(stdin, 0, SEEK_END);
-		return newNode;
 		//End of debug
 		*/
+		return newNode;
+
 	}
 	//Checking if the list is single wayed or double wayed
 	if (!list->type)
