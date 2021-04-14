@@ -27,12 +27,12 @@ typedef struct Node
 	Trip* trip;
 	union
 	{
-		struct {
+		struct { //8 bytes
 			struct Node *prev;
 			struct Node *nextDouble;
 		}DoubleType;
 
-		struct Node *nextSingle;
+		struct Node *nextSingle; //4 bytes
 	}listType;
 }Node;
 
@@ -81,7 +81,14 @@ Node* AddNodeToEnd(Node* list,Trip* tripPtr) {
 	{
 		newNode->trip->numTrip = 1;
 		newNode->type = 0;
+		/*
+		//Debug for Double way list
+		printf("What type of linked list would you like?\n0-Single/ 1-Double: ");
+		scanf("%d", &(newNode->type));
+		fseek(stdin, 0, SEEK_END);
 		return newNode;
+		//End of debug
+		*/
 	}
 	//Checking if the list is single wayed or double wayed
 	if (!list->type)
@@ -94,8 +101,8 @@ Node* AddNodeToEnd(Node* list,Trip* tripPtr) {
 	{
 		//Getting to the last node, and counting the number of the trip
 		for (; ptr->listType.DoubleType.nextDouble != NULL; ptr = ptr->listType.DoubleType.nextDouble,tripCount++);
-		
-		newNode->trip->numTrip = tripCount++;
+		tripCount++;
+		newNode->trip->numTrip = tripCount;
 		newNode->listType.DoubleType.prev = ptr;
 		ptr->listType.DoubleType.nextDouble = newNode;
 		return list;
@@ -213,28 +220,22 @@ Node *deleteNode(Node* list, Date date)
 			result = TRUE;
 		}
 		ptr = list;
-		while (ptr != NULL)
+
+		while (ptr->listType.DoubleType.nextDouble != NULL)
 		{
 			//found a matching date in the middle
-			if (dateCheck(date, ptr->trip->dateTrip))
+			if (dateCheck(date, ptr->listType.DoubleType.nextDouble->trip->dateTrip))
 			{
-				temp = ptr;
-
-				//Checking if the the current node is the tail
-				if (ptr->listType.DoubleType.nextDouble == NULL)
-				{
-					ptr->listType.DoubleType.prev->listType.DoubleType.nextDouble = temp->listType.DoubleType.nextDouble;
-				}
-				else
-				{
-					ptr->listType.DoubleType.prev->listType.DoubleType.nextDouble = temp->listType.DoubleType.nextDouble;
-					ptr->listType.DoubleType.nextDouble->listType.DoubleType.prev = ptr->listType.DoubleType.prev;
-					numTripUpdate(ptr->listType.DoubleType.nextDouble);
-				}
+				temp = ptr->listType.DoubleType.nextDouble;
+				ptr->listType.DoubleType.nextDouble = temp->listType.DoubleType.nextDouble;
+				if (temp->listType.DoubleType.nextDouble)
+					temp->listType.DoubleType.nextDouble->listType.DoubleType.prev = ptr;
 				freeNode(temp);
+				numTripUpdate(ptr->listType.DoubleType.nextDouble);
 				result = TRUE;
 			}
 			ptr = ptr->listType.DoubleType.nextDouble;
+			if (!ptr) break;
 		}
 	}
 	if (result) printf("All the trips at this date are deleted!\n");
