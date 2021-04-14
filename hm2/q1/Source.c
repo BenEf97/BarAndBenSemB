@@ -186,11 +186,18 @@ Node *deleteNode(Node* list, Date date)
 		//delete first and update the list head
 		while (dateCheck(date, list->trip->dateTrip))
 		{
+			if (list->listType.nextSingle == NULL)
+			{
+				free(list);
+				printf("Trip deleted! Now the list is empty.\n");
+				return NULL;
+			}
 			temp = list;
 			list = temp->listType.nextSingle;
 			numTripUpdate(list);
 			freeNode(temp);
 			result = TRUE;
+
 		}
 		ptr = list;
 
@@ -216,6 +223,12 @@ Node *deleteNode(Node* list, Date date)
 		//delete first and update the list head
 		while (dateCheck(date, list->trip->dateTrip))
 		{
+			if (list->listType.DoubleType.nextDouble == NULL)
+			{
+				free(list);
+				printf("Trip deleted! Now the list is empty.\n");
+				return NULL;
+			}
 			temp = list;
 			list = temp->listType.DoubleType.nextDouble;
 			list->listType.DoubleType.prev = NULL;
