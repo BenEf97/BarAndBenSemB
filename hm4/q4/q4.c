@@ -176,6 +176,20 @@ int isPlindrom(Stack s)
 }
 
 
+void allocationFail()
+{
+	printf("Out of memory! Exiting the program!\n");
+	exit(1);
+}
+
+//creating new stack
+void stackInit(Stack* s)
+{
+	s->head = (Node*)calloc(1, sizeof(Node));
+	if (!s->head)
+		allocationFail();
+}
+
 void main()
 {
 	////Hash Flipper start
@@ -186,7 +200,8 @@ void main()
 
 	printf("\n");
 	Stack pilandromS;
-	pilandromS.head = (Node*)calloc(1, sizeof(Node));
+	stackInit(&pilandromS);
+	//pilandromS.head = (Node*)calloc(1, sizeof(Node));
 	stackInput(&pilandromS);
 	isPlindrom(pilandromS);
 	system("pause");
