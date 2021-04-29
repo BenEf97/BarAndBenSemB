@@ -66,7 +66,7 @@ char* strInput()
 	char str[SIZE];
 	printf("Please enter up to %d letter string: ",SIZE);
 	fseek(stdin, 0, SEEK_END);
-	gets(str);
+	scanf("%s",str);
 	return str;
 }
 
@@ -110,13 +110,13 @@ void hashFlipper(char* str)
 	free(temp1);
 }
 
-void stackInput(Stack* s)
+void stackStrInput(Stack* s)
 {
 	char str[SIZE];
 	int i=0;
 	printf("Enter a plindrom:");
 	fseek(stdin,0,SEEK_END);
-	gets(str);
+	scanf("%s",str);
 	while (str[i]!='\0')
 	{
 		push(s,str[i]);
@@ -156,7 +156,7 @@ int isPlindrom(Stack s)
 	if (count == 1)
 	{
 		printf("The stack has only 1 character!\n");
-		return;
+		return FALSE;
 	}
 
 	if (!count%2) even=TRUE;
@@ -196,6 +196,74 @@ void stackInit(Stack* s)
 	if (!s->head)
 		allocationFail();
 }
+int nCheck(Stack *s, int n)
+{
+	Stack tmp;
+	tmp.head = (Node*)calloc(1, sizeof(Node));
+	int count = 0;
+	while (s->head->data != '\0')
+	{
+		push(&tmp,pop(s));
+		count++;
+	}
+	while (tmp.head->data != '\0')
+	{
+		push(s, pop(&tmp));
+	}
+	return (n > count) ? TRUE : FALSE;
+}
+void stackInput(Stack* s)
+{
+	int i = 1;
+	char c, decide;
+	while (i)
+	{
+		printf("Enter char to the stack: ");
+		fseek(stdin, 0, SEEK_END);
+		scanf("%c", &c);
+		push(s, c);
+		printf("do you want to add another one ('y' or 'n')? ");
+		fseek(stdin, 0, SEEK_END);
+		scanf("%c", &decide);
+		if (decide == 'n') i=0;
+	}
+}
+void rotate(Stack *s, int n)
+{
+	int check, i = 0;
+	Stack tmp1, tmp2;
+	if (!n)
+	{
+		printf("there is nothing to replace\n");
+		return;
+	}
+	if (isEmpty(s))
+	{
+		printf("stack is empty!\n");
+		return;
+	}
+	if (nCheck(s, n))
+	{
+		printf("the stack is not big enough for replace\n");
+		return;
+	}
+	tmp1.head = (Node*)calloc(1 , sizeof(Node));
+	tmp2.head = (Node*)calloc(1 , sizeof(Node));
+	while (i < n)
+	{
+		push(&tmp1, pop(s));
+		i++;
+	}
+	while (s->head->data != '\0') push(&tmp2, pop(s));
+	while (tmp1.head->data != '\0') push(s, pop(&tmp1));
+	while (tmp2.head->data != '\0') push(s, pop(&tmp2));
+	
+	while (s->head->data != '\0')
+	{
+		printf("%c\t", pop(s));
+	}
+	printf("\n");
+}
 
 void main()
 {
@@ -205,12 +273,20 @@ void main()
 	//hashFlipper(str);
 	////Hash Flipper end
 
-	printf("\n");
-	Stack pilandromS;
-	stackInit(&pilandromS);
-	//pilandromS.head = (Node*)calloc(1, sizeof(Node));
-	stackInput(&pilandromS);
-	(isPlindrom(pilandromS) == TRUE) ? printf("is plindrom") : printf("is not plindrom");
+	//printf("\n");
+	//Stack pilandromS;
+	//stackInit(&pilandromS);
+	//stackStrInput(&pilandromS);
+	//(isPlindrom(pilandromS) == TRUE) ? printf("is plindrom") : printf("is not plindrom");
 	
+	Stack Nstack;
+	int n;
+	stackInit(&Nstack);
+	stackInput(&Nstack);
+	printf("Please choose how much elements you want to replace: ");
+	fseek(stdin, 0, SEEK_END);
+	scanf("%d", &n);
+	rotate(&Nstack, n);
+
 	system("pause");
 }
