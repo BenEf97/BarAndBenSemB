@@ -114,6 +114,7 @@ void stackInput(Stack* s)
 {
 	char str[SIZE];
 	int i=0;
+	printf("Enter a plindrom:");
 	fseek(stdin,0,SEEK_END);
 	gets(str);
 	while (str[i]!='\0')
@@ -142,8 +143,14 @@ int isPlindrom(Stack s)
 
 	while(!isEmpty(&s))
 	{
+		if (s.head->data == '\0')
+		{
+			pop(&s);
+			continue;
+		}
 		push(temp, pop(&s));
 		count++;
+		
 	}
 
 	if (count == 1)
@@ -152,7 +159,7 @@ int isPlindrom(Stack s)
 		return;
 	}
 
-	if (count%2) even=TRUE;
+	if (!count%2) even=TRUE;
 	else even=FALSE;
 
 	count/=2;
@@ -203,6 +210,7 @@ void main()
 	stackInit(&pilandromS);
 	//pilandromS.head = (Node*)calloc(1, sizeof(Node));
 	stackInput(&pilandromS);
-	isPlindrom(pilandromS);
+	(isPlindrom(pilandromS) == TRUE) ? printf("is plindrom") : printf("is not plindrom");
+	
 	system("pause");
 }
