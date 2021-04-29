@@ -88,7 +88,7 @@ void hashFlipper(char* str)
 		exit(1);
 	}
 
-
+	printf("the fixed string is: ");
 	while (str[i]!='\0')
 	{
 		if (str[i]=='#')
@@ -106,7 +106,7 @@ void hashFlipper(char* str)
 		printf("%c",str[i]);
 		i++;
 	}
-
+	printf("\n\n");
 	free(temp1);
 }
 
@@ -210,27 +210,31 @@ int nCheck(Stack *s, int n)
 	{
 		push(s, pop(&tmp));
 	}
+	free(tmp.head);
 	return (n > count) ? TRUE : FALSE;
 }
 void stackInput(Stack* s)
 {
 	int i = 1;
-	char c, decide;
+	char c;
 	while (i)
 	{
-		printf("Enter char to the stack: ");
+		printf("Enter char to the stack (enter '0' to end): ");
 		fseek(stdin, 0, SEEK_END);
 		scanf("%c", &c);
-		push(s, c);
-		printf("do you want to add another one ('y' or 'n')? ");
-		fseek(stdin, 0, SEEK_END);
-		scanf("%c", &decide);
-		if (decide == 'n') i=0;
+		switch (c)
+		{
+			case '0':
+				i = 0;
+				break;
+			default: 
+				push(s, c);
+		}
 	}
 }
 void rotate(Stack *s, int n)
 {
-	int check, i = 0;
+	int i = 0;
 	Stack tmp1, tmp2;
 	if (!n)
 	{
@@ -257,28 +261,33 @@ void rotate(Stack *s, int n)
 	while (s->head->data != '\0') push(&tmp2, pop(s));
 	while (tmp1.head->data != '\0') push(s, pop(&tmp1));
 	while (tmp2.head->data != '\0') push(s, pop(&tmp2));
-	
+
 	while (s->head->data != '\0')
 	{
 		printf("%c\t", pop(s));
 	}
 	printf("\n");
+	free(tmp1.head);
+	free(tmp2.head);
 }
 
 void main()
 {
-	////Hash Flipper start
-	//printf("***Hash Flipper***\nThis function will receive a string, print it and flip the letters between two hashtags '#'\n");
-	//char str[] = { "Remem#reb# thi#carp s#tice" };
-	//hashFlipper(str);
-	////Hash Flipper end
+	//Hash Flipper start
+	printf("***Hash Flipper***\nThis function will receive a string, print it and flip the letters between two hashtags '#'\n");
+	char str[] = { "Remem#reb# thi#carp s#tice" };
+	printf("the original string is: ");
+	puts(str);
+	hashFlipper(str);
+	//Hash Flipper end
 
-	//printf("\n");
-	//Stack pilandromS;
-	//stackInit(&pilandromS);
-	//stackStrInput(&pilandromS);
-	//(isPlindrom(pilandromS) == TRUE) ? printf("is plindrom") : printf("is not plindrom");
+	printf("***Is Plindrom***\n");
+	Stack plindromS;
+	stackInit(&plindromS);
+	stackStrInput(&plindromS);
+	(isPlindrom(plindromS) == TRUE) ? printf("is plindrom\n\n") : printf("is not plindrom\n\n");
 	
+	printf("***Rotate***\n");
 	Stack Nstack;
 	int n;
 	stackInit(&Nstack);
@@ -287,6 +296,7 @@ void main()
 	fseek(stdin, 0, SEEK_END);
 	scanf("%d", &n);
 	rotate(&Nstack, n);
+	free(Nstack.head);
 
-	system("pause");
+	//system("pause");
 }
