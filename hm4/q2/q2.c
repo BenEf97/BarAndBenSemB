@@ -122,7 +122,8 @@ void rotate(Queue* s)
 //gets a pointer for a queue, cuts it in half, excact same size, replace the order
 void cutAndReplace(Queue *s)
 {	
-	int size,average=0;
+	int size;
+	unsigned int average = 0;
 	Queue tmp1, tmp2;
 
 	//checking if the queue is empty
@@ -132,8 +133,8 @@ void cutAndReplace(Queue *s)
 		return;
 	}
 
-	initQueue(tmp1);
-	initQueue(tmp2);	
+	initQueue(&tmp1);
+	initQueue(&tmp2);	
 	size=sizeQueue(s);
 	
 	//if odd, will add the average to be the last node
@@ -143,7 +144,7 @@ void cutAndReplace(Queue *s)
 		for (int i=0,tmp;i<size;i++)
 		{
 			tmp = dequeue(s);
-			agverage += tmp;
+			average += tmp;
 			enqueue(s,tmp);
 		}
 		//calculating the average, and updating the size
@@ -156,31 +157,33 @@ void cutAndReplace(Queue *s)
 
 	//getting the first half out
 	for (int i=0;i<size;i++)
-		enqueue(tmp1,dequeue(s));
+		enqueue(&tmp1,dequeue(s));
 
 	//getting the second half out
 	for (int i = 0; i < size; i++)
-		enqueue(tmp2, dequeue(s));
+		enqueue(&tmp2, dequeue(s));
 
 	//rotating the 2nd queue and enqueuing into the original queue
 	for(int i=0;i<size-1;i++)
 	{
-		rotate(tmp2);
-		enqueue(s,dequeue(tmp2));
+		rotate(&tmp2);
+		enqueue(s,dequeue(&tmp2));
 	}
 
 	//enqueue the last one from 2nd queue
-	enqueue(s,dequeue(tmp2));
+	enqueue(s,dequeue(&tmp2));
 
 	//enqueue the first half
 	for (int i=0;i<size;i++)
-		enqueue(s,dequeue(tmp1));
+		enqueue(s,dequeue(&tmp1));
 }
 
 //gets a pointer to the queue, sorting it from the smallest to the biggest
 void sort(Queue *s)
 {
-	Queue temp1,temp2;
+	Queue temp1;
+	unsigned int tmp,i=1;
+	int size;
 	
 	//checking if the queue is empty, if it does will return
 	if (IsEmpty(s))
@@ -188,57 +191,110 @@ void sort(Queue *s)
 		printf("The queue is empty!\n");
 		return;
 	}
+
+	initQueue(&temp1);
 	
+	while (!isEmpty(s))
+	{
+		size=sizeQueue(s);
+		for (int j = 0; j < size; j++)
+		{
+			tmp = dequeue(s);
+			if (tmp < i) enqueue(&temp1, tmp);
+			else enqueue(s, tmp);
+		}
+		i++;
+	}
+	while (!isEmpty(&temp1))
+		enqueue(s, dequeue(&temp1));
 }
 
-//don't forget to delete
-void plushminus(QUEUE* q) 
+void printQueue(Queue* s) 
 {
-	if (isEmpty(q))
+	if (isEmpty(s))
 	{
-		printf("empty!");
+		printf("The queue is empty!");
 		return;
 	}
-
-	QUEUE pos, neg;// , zero;
-	initQueue(&pos);
-	initQueue(&neg);
-	//initQueue(&zero);
-	int data, count=0;
-	while (!isEmpty(q))
+	Queue qtemp;
+	initQueue(&qtemp);
+	unsigned int data;
+	while (!isEmpty(s))
 	{
-		data = dequeue(q);
-		if (data > 0)
-			enqueue(&pos, data);
-		else if (data < 0)
-			enqueue(&neg, data);
-		else
-			count++;
-			//enqueue(&zero,data);
+		data = dequeue(s);
+		printf("%u\t", data);
+		enqueue(&qtemp,data);
 	}
+	while (!isEmpty(&qtemp))
+	{
+		enqueue(s, dequeue(&qtemp));
+	}
+}
 
-	while (!isEmpty(&neg))
-		enqueue(q, dequeue(&neg));
-
-	for (int i = 0; i < count; i++)
-		enqueue(q,0);
-	
-	/*while (!isEmpty(&zero))
-		enqueue(q, dequeue(&zero));*/
-
-	while (!isEmpty(&pos))
-		enqueue(q, dequeue(&pos));
-
+void queueInput(Queue* s)
+{
+	unsigned int num, size;
+	printf("how much elements you want to add");
+	scanf("%d", &size);
+	for(int i=0;i<size;i++)
+	{
+		printf("Please enter unsigned integer: ");
+		scanf("%u", &num);
+		enqueue(s, num);
+	}
+	printf("Please enter unsigned integer: ");
+	scanf("%u", &num);
 }
 
 
 
 void main()
 {
-	Queue test;
-	initQueue(&test);
-	for (unsigned int num=1;num<5;num++) 
-		enqueue(&test,num);
-	printf("size is %d\n",sizeQueue(&test));
-	printf("1 is empty, 0 isn't: %d",isEmpty(&test));
+	Queue q1,q2,q3;
+	int size;
+	initQueue(&q1);
+	initQueue(&q2);
+	initQueue(&q3);
+
+	printf("Q1: Rotate:\n");
+	queueInput(&q1);
+	printf("The queue before: ");
+	printQueue(&q1);
+	rotate(&q1);
+	printf("\nAfter the rotate: ");
+	printQueue(&q1);
+
+	size=sizeQueue(&q1);
+	for (int i=0;i<size;i++)
+	{
+		dequeue(&q1);
+	}
+
+	printf("\nQ2: Cut And Replace:\n");
+	queueInput(&q2);
+	printf("The Queue before: ");
+	printQueue(&q2);
+	cutAndReplace(&q2);
+	printf("After: ");
+	printQueue(&q2);
+
+	size=sizeQueue(&q2);
+	for (int i=0;i<size;i++)
+	{
+		dequeue(&q2);
+	}
+
+	printf("\nQ3: Sort\n");
+	queueInput(&q3);
+	printf("The queue before: ");
+	printQueue(&q3);
+	rotate(&q3);
+	printQueue(&q3);
+
+	size=sizeQueue(&q3);
+	for (int i=0;i<size;i++)
+	{
+		dequeue(&q3);
+	}
+
 }
