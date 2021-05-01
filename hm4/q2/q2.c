@@ -1,7 +1,3 @@
-/*need to change the function, can't acsess directly, only with data retaree*/
-
-
-
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdlib.h>
 #include <stdio.h>
@@ -78,7 +74,7 @@ int sizeQueue(Queue *s)
 	initQueue(&temp);
 
 	//Checking the size of the queue	
-	while (!isEmpty(&s))
+	while (!isEmpty(s))
 	{
 		enqueue(&temp, dequeue(s));
 		size++;
@@ -95,7 +91,6 @@ int sizeQueue(Queue *s)
 //Rotating the queue, taking the last to be the first
 void rotate(Queue* s)
 {
-	unsigned int first,last;
 	int size;
 
 	//checking if the queue is empty, if it does will return to main
@@ -186,7 +181,7 @@ void sort(Queue *s)
 	int size;
 	
 	//checking if the queue is empty, if it does will return
-	if (IsEmpty(s))
+	if (isEmpty(s))
 	{
 		printf("The queue is empty!\n");
 		return;
@@ -233,8 +228,9 @@ void printQueue(Queue* s)
 
 void queueInput(Queue* s)
 {
-	unsigned int num, size;
-	printf("how much elements you want to add");
+	unsigned int num;
+	int size;
+	printf("Enter how many elements you want to add: ");
 	scanf("%d", &size);
 	for(int i=0;i<size;i++)
 	{
@@ -242,8 +238,7 @@ void queueInput(Queue* s)
 		scanf("%u", &num);
 		enqueue(s, num);
 	}
-	printf("Please enter unsigned integer: ");
-	scanf("%u", &num);
+	printf("\n");
 }
 
 
@@ -275,7 +270,7 @@ void main()
 	printf("The Queue before: ");
 	printQueue(&q2);
 	cutAndReplace(&q2);
-	printf("After: ");
+	printf("\nAfter: ");
 	printQueue(&q2);
 
 	size=sizeQueue(&q2);
@@ -288,7 +283,8 @@ void main()
 	queueInput(&q3);
 	printf("The queue before: ");
 	printQueue(&q3);
-	rotate(&q3);
+	sort(&q3);
+	printf("\nThe queue after: ");
 	printQueue(&q3);
 
 	size=sizeQueue(&q3);
