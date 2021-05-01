@@ -42,13 +42,15 @@ void main()
 	//Hash Flipper end
 
 	//Q2: Pilandrom start
-	printf("***Is Plindrom***\n");
+	printf("***Is Plindrom***\nThis function will check if the string is a plindrom\n");
 	Stack plindromS;
 	stackInit(&plindromS);
 	stackStrInput(&plindromS);
-	(isPlindrom(plindromS) == TRUE) ? printf("is plindrom\n\n") : printf("is not plindrom\n\n");
-	
-	printf("***Rotate***\n");
+	(isPlindrom(plindromS) == TRUE) ? printf("The string is a plindrom\n\n") : printf("The string isn't a plindrom\n\n");
+	//Pilandrom end
+
+	//Q3: Rotate start
+	printf("***Rotate***\nThis function will take n first elements and rotate with last elemetns\n");
 	Stack Nstack;
 	int n;
 	stackInit(&Nstack);
@@ -59,7 +61,7 @@ void main()
 	rotate(&Nstack, n);
 	free(Nstack.head);
 	printf("\n");
-	//system("pause");
+	//Rotate end
 }
 
 //Pushing new node and data to the stack
@@ -131,7 +133,7 @@ void printStack(Stack *s)
 	}
 }
 
-//Seek for hash #, creating a stack and flipping it. Prints the whole sentence.
+//Q1: Seek for hash #, creating a stack and flipping it. Prints the whole sentence.
 void hashFlipper(char* str)
 {
 	int i = 0;
@@ -185,7 +187,7 @@ void stackStrInput(Stack* s)
 	}
 }
 
-//Checking if a stack is pilandrom
+//Q2: Checking if a stack is pilandrom
 int isPlindrom(Stack s)
 {
 	//result will determine if its a pilandrom or not.

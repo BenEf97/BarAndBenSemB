@@ -1,10 +1,8 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
 #define TRUE 1
 #define FALSE 0 
-#define SIZE 100
 
 
 typedef struct Node
@@ -19,16 +17,70 @@ typedef struct Queue
 	Node *tail;
 } Queue;
 
+int isEmpty(Queue* s);
+unsigned int dequeue(Queue* s);
+void enqueue(Queue* s, unsigned int data);
+void initQueue(Queue* s);
+int sizeQueue(Queue *s);
+void rotate(Queue* s);
+void cutAndReplace(Queue *s);
+void sort(Queue *s);
+void printQueue(Queue* s);
+void queueInput(Queue* s);
+void resetQueue(Queue* s);
+void secSort(Queue* s);
+
+void main()
+{
+	Queue q;
+	initQueue(&q);
+	//
+	////Q1 Rotate start
+	//printf("Q1: Rotate- This function rotates the queue until the last node will be the first one\n");
+	//queueInput(&q);
+	//printf("The queue before: ");
+	//printQueue(&q);
+	//rotate(&q);
+	//printf("\nAfter the rotate: ");
+	//printQueue(&q);
+
+	////reseting the queue, freeing all the allocations and preparing for the next one
+	//resetQueue(&q);
+	////Rotate end
+
+	////Q2 Cut and Replace start
+	//printf("\nQ2: Cut And Replace- This function cuts the queue in half, flips the second half, and replaces the halfs:\n");
+	//queueInput(&q);
+	//printf("The Queue before: ");
+	//printQueue(&q);
+	//cutAndReplace(&q);
+	//printf("\nAfter: ");
+	//printQueue(&q);
+	//resetQueue(&q);
+	////Cut and replace end
+
+	//Q3 Sort start
+	printf("\nQ3: Sort-This function sorts the integers from the smallest to the biggest\n");
+	queueInput(&q);
+	printf("The queue before: ");
+	printQueue(&q);
+	sort(&q);
+	printf("\nThe queue after: ");
+	printQueue(&q);
+	resetQueue(&q);
+	//Sort end
+}
+
 //if the Queue is empty, will return TRUE, else will return FALSE
 int isEmpty(Queue* s)
 {
 	if (s->head == NULL && s->tail == NULL)
-		return TRUE;
+			return TRUE;
 	else return FALSE;
 }
 
-//Removing from the head
-int dequeue(Queue* s) 
+//Removing from the head, from lecture
+unsigned int dequeue(Queue* s) 
 {
 	Node* temp = s->head;
 	unsigned int data = temp->data;
@@ -36,7 +88,7 @@ int dequeue(Queue* s)
 	if (isEmpty(s)) 
 	{
 		printf("empty!");
-		return -1;
+		return 0;
 	}
 
 	s->head = s->head->next;
@@ -47,6 +99,7 @@ int dequeue(Queue* s)
 	return data;
 }
 
+//Enqueue new node to the end of the Queue. Used from lecture
 void enqueue(Queue* s, unsigned int data)
 {
 	Node* newNode = (Node*)calloc(1, sizeof(Node));
@@ -60,7 +113,7 @@ void enqueue(Queue* s, unsigned int data)
 	s->head = s->tail = newNode;
 }
 
-//maayan initqueue
+//initQueue from lecture
 void initQueue(Queue* s) 
 {
 	s->head = s->tail = NULL;
@@ -88,7 +141,7 @@ int sizeQueue(Queue *s)
 	return size;
 }
 
-//Rotating the queue, taking the last to be the first
+//Q1: Rotating the queue, taking the last to be the first
 void rotate(Queue* s)
 {
 	int size;
@@ -114,7 +167,7 @@ void rotate(Queue* s)
 	}
 }
 
-//gets a pointer for a queue, cuts it in half, excact same size, replace the order
+//Q2: gets a pointer for a queue, cuts it in half, excact same size, replace the order
 void cutAndReplace(Queue *s)
 {	
 	int size;
@@ -173,7 +226,7 @@ void cutAndReplace(Queue *s)
 		enqueue(s,dequeue(&tmp1));
 }
 
-//gets a pointer to the queue, sorting it from the smallest to the biggest
+//Q3: gets a pointer to the queue, sorting it from the smallest to the biggest
 void sort(Queue *s)
 {
 	Queue temp1;
@@ -186,9 +239,11 @@ void sort(Queue *s)
 		printf("The queue is empty!\n");
 		return;
 	}
-
+	
+	//allocating the temporary queue
 	initQueue(&temp1);
 	
+	//searching in the queue using enqueue and dequeue for numbers in order from min to max and built it in the temp queue
 	while (!isEmpty(s))
 	{
 		size=sizeQueue(s);
@@ -200,10 +255,79 @@ void sort(Queue *s)
 		}
 		i++;
 	}
+	//returning the organized queue to the original queue and at the same time free the temp queue
 	while (!isEmpty(&temp1))
 		enqueue(s, dequeue(&temp1));
 }
 
+void secSort(Queue *s)
+{
+	Queue temp1;
+	unsigned int tmp,i=1,min;
+	int size;
+	
+	//checking if the queue is empty, if it does will return
+	if (isEmpty(s))
+	{
+		printf("The queue is empty!\n");
+		return;
+	}
+
+	size = sizeQueue(s);
+
+	//allocating the temporary queue
+	initQueue(&temp1);
+	
+	//seeking for the minimal value, and returning to the original state
+	while(!isEmpty(s))
+	{		
+		//init tmp and min to be the data of the head, and putting the data back
+		tmp = min = dequeue(s);
+		enqueue(s,min);
+		
+		//seeking for the smallest value
+		for (int j=0;j<size-1;j++)
+		{
+			tmp=dequeue(s);
+			if (tmp<min) min=tmp;
+			enqueue(s,tmp);
+		}
+
+		//seeking and enqueue to the temp1
+		for (int j=0;j<size;j++)
+		{
+			tmp=dequeue(s);
+			//if tmp==min will enqueue to the tmp, else will continue without change
+			if (tmp==min)
+				{
+					enqueue(&temp1,tmp);
+					break;
+				}
+			enqueue(s,tmp);
+		}
+		size--;
+	}
+
+
+	/*
+	//searching in the queue using enqueue and dequeue for numbers in order from min to max and built it in the temp queue
+	while (!isEmpty(s))
+	{
+		size=sizeQueue(s);
+		for (int j = 0; j < size; j++)
+		{
+			tmp = dequeue(s);
+			if (tmp < i) enqueue(&temp1, tmp);
+			else enqueue(s, tmp);
+		}
+		i++;
+	}*/
+	//returning the organized queue to the original queue and at the same time free the temp queue
+	while (!isEmpty(&temp1))
+		enqueue(s, dequeue(&temp1));	
+}
+
+//print the queue 
 void printQueue(Queue* s) 
 {
 	if (isEmpty(s))
@@ -226,6 +350,7 @@ void printQueue(Queue* s)
 	}
 }
 
+//user input for the queue 
 void queueInput(Queue* s)
 {
 	unsigned int num;
@@ -241,56 +366,11 @@ void queueInput(Queue* s)
 	printf("\n");
 }
 
-
-
-void main()
+//Freeing the nodes, and initilize the queue
+void resetQueue(Queue* s)
 {
-	Queue q1,q2,q3;
-	int size;
-	initQueue(&q1);
-	initQueue(&q2);
-	initQueue(&q3);
-
-	printf("Q1: Rotate:\n");
-	queueInput(&q1);
-	printf("The queue before: ");
-	printQueue(&q1);
-	rotate(&q1);
-	printf("\nAfter the rotate: ");
-	printQueue(&q1);
-
-	size=sizeQueue(&q1);
+	int size=sizeQueue(s);
 	for (int i=0;i<size;i++)
-	{
-		dequeue(&q1);
-	}
-
-	printf("\nQ2: Cut And Replace:\n");
-	queueInput(&q2);
-	printf("The Queue before: ");
-	printQueue(&q2);
-	cutAndReplace(&q2);
-	printf("\nAfter: ");
-	printQueue(&q2);
-
-	size=sizeQueue(&q2);
-	for (int i=0;i<size;i++)
-	{
-		dequeue(&q2);
-	}
-
-	printf("\nQ3: Sort\n");
-	queueInput(&q3);
-	printf("The queue before: ");
-	printQueue(&q3);
-	sort(&q3);
-	printf("\nThe queue after: ");
-	printQueue(&q3);
-
-	size=sizeQueue(&q3);
-	for (int i=0;i<size;i++)
-	{
-		dequeue(&q3);
-	}
-
+		dequeue(s);
+	initQueue(s);
 }
