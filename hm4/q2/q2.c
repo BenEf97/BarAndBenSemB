@@ -28,36 +28,35 @@ void sort(Queue *s);
 void printQueue(Queue* s);
 void queueInput(Queue* s);
 void resetQueue(Queue* s);
-void secSort(Queue* s);
 
 void main()
 {
 	Queue q;
 	initQueue(&q);
-	//
-	////Q1 Rotate start
-	//printf("Q1: Rotate- This function rotates the queue until the last node will be the first one\n");
-	//queueInput(&q);
-	//printf("The queue before: ");
-	//printQueue(&q);
-	//rotate(&q);
-	//printf("\nAfter the rotate: ");
-	//printQueue(&q);
+	
+	//Q1 Rotate start
+	printf("Q1: Rotate- This function rotates the queue until the last node will be the first one\n");
+	queueInput(&q);
+	printf("The queue before: ");
+	printQueue(&q);
+	rotate(&q);
+	printf("\nAfter the rotate: ");
+	printQueue(&q);
 
-	////reseting the queue, freeing all the allocations and preparing for the next one
-	//resetQueue(&q);
-	////Rotate end
+	//reseting the queue, freeing all the allocations and preparing for the next one
+	resetQueue(&q);
+	//Rotate end
 
-	////Q2 Cut and Replace start
-	//printf("\nQ2: Cut And Replace- This function cuts the queue in half, flips the second half, and replaces the halfs:\n");
-	//queueInput(&q);
-	//printf("The Queue before: ");
-	//printQueue(&q);
-	//cutAndReplace(&q);
-	//printf("\nAfter: ");
-	//printQueue(&q);
-	//resetQueue(&q);
-	////Cut and replace end
+	//Q2 Cut and Replace start
+	printf("\nQ2: Cut And Replace- This function cuts the queue in half, flips the second half, and replaces the halfs:\n");
+	queueInput(&q);
+	printf("The Queue before: ");
+	printQueue(&q);
+	cutAndReplace(&q);
+	printf("\nAfter: ");
+	printQueue(&q);
+	resetQueue(&q);
+	//Cut and replace end
 
 	//Q3 Sort start
 	printf("\nQ3: Sort-This function sorts the integers from the smallest to the biggest\n");
@@ -230,40 +229,7 @@ void cutAndReplace(Queue *s)
 void sort(Queue *s)
 {
 	Queue temp1;
-	unsigned int tmp,i=1;
-	int size;
-	
-	//checking if the queue is empty, if it does will return
-	if (isEmpty(s))
-	{
-		printf("The queue is empty!\n");
-		return;
-	}
-	
-	//allocating the temporary queue
-	initQueue(&temp1);
-	
-	//searching in the queue using enqueue and dequeue for numbers in order from min to max and built it in the temp queue
-	while (!isEmpty(s))
-	{
-		size=sizeQueue(s);
-		for (int j = 0; j < size; j++)
-		{
-			tmp = dequeue(s);
-			if (tmp < i) enqueue(&temp1, tmp);
-			else enqueue(s, tmp);
-		}
-		i++;
-	}
-	//returning the organized queue to the original queue and at the same time free the temp queue
-	while (!isEmpty(&temp1))
-		enqueue(s, dequeue(&temp1));
-}
-
-void secSort(Queue *s)
-{
-	Queue temp1;
-	unsigned int tmp,i=1,min;
+	unsigned int tmp, min;
 	int size;
 	
 	//checking if the queue is empty, if it does will return
@@ -308,20 +274,6 @@ void secSort(Queue *s)
 		size--;
 	}
 
-
-	/*
-	//searching in the queue using enqueue and dequeue for numbers in order from min to max and built it in the temp queue
-	while (!isEmpty(s))
-	{
-		size=sizeQueue(s);
-		for (int j = 0; j < size; j++)
-		{
-			tmp = dequeue(s);
-			if (tmp < i) enqueue(&temp1, tmp);
-			else enqueue(s, tmp);
-		}
-		i++;
-	}*/
 	//returning the organized queue to the original queue and at the same time free the temp queue
 	while (!isEmpty(&temp1))
 		enqueue(s, dequeue(&temp1));	
