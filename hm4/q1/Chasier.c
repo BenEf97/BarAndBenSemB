@@ -9,8 +9,6 @@
 #include <stdlib.h>
 #include <string.h>
 #define SIZE 80
-#define TRUE 1
-#define FALSE 0
 #define SIZE2 100
 
 typedef struct groceryItem
@@ -32,13 +30,22 @@ void CreateInvoice(groceryList * pList);
 void CalcInvoiceRowSummary();
 void allocationFail();
 void openFileFailed();
+char menu(groceryList * pList);
+void freeList(groceryList * pList);
 
 void main()
 {
 	//debug
+
+	//init
 	groceryList pList;
+	char option;
 	pList.listItems = (groceryItem**)calloc(1, sizeof(groceryItem));
 	pList.size = 0;
+	option = menu(&pList);
+	if (!option)
+		freeList(&pList);
+
 	addGroceryItem(&pList);
 	addGroceryItem(&pList);
 	CreateInvoice(&pList);
@@ -46,6 +53,56 @@ void main()
 	undo(&pList);
 	undo(&pList);
 	//free(&pList.listItems);
+}
+
+
+//free the list
+void freeList(groceryList * pList)
+{
+	//the list is already empty
+	if (!pList->listItems)
+		return;
+
+	//free all the data in the list
+	for (int idx = 0; idx < pList->size; idx++)
+	{
+		free(pList->listItems[idx]);
+	}
+	free(pList->listItems);
+}
+
+//Q1 e: main menu
+char menu(groceryList * pList)
+{
+	//init
+	char option;
+
+	//prints all the options to the user, while option 1 and 2 will get the functions, 3 will get invoice and end the menu function
+	while(1)
+	{
+		printf("\n\t***Main Menu***\n1. Add Grocery Item\n2. Undo\n3.Finish and get Invoice\n");
+		scanf("%c", option);
+
+		switch (option)
+		{
+		case '1':
+			printf("--Add Grocery Item--\n");
+			addGroceryItem(pList);
+			printf("The item has been added!\n");
+			continue;
+		case '2':
+			printf("--Undo--\n");
+			undo(pList);
+			printf("Undo complete!\n");
+			continue;
+		case '3':
+			printf("--Finish and get Invoice--\nThank you! The invoice will be at your program folder...\n");
+			CreateInvoice(pList);
+			CalcInvoiceRowSummary(pList);
+			return NULL;
+		default: continue;
+		}
+	}
 }
 
 
@@ -157,7 +214,13 @@ void CalcInvoiceRowSummary()
 {
 	//init all vars
 	FILE *pfr = fopen("invoice.txt", "r+");
+	if (!pfr)
+		openFileFailed();
+
 	FILE *pft = fopen("tmpfile.txt", "a+");
+	if (!pft)
+		openFileFailed();
+
 	char c = 0, tmp[20];
 	int  idx, num1;
 	float sum, num2;
@@ -225,6 +288,8 @@ void CalcInvoiceRowSummary()
 		fputc(c, pfr);
 		c = fgetc(pft);
 	}
+
+	//closing the files
 	fclose(pft);
 	fclose(pfr);
 }
