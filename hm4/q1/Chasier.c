@@ -11,6 +11,7 @@
 #define SIZE 80
 #define TRUE 1
 #define FALSE 0
+#define SIZE2 100
 
 typedef struct groceryItem
 {
@@ -154,50 +155,78 @@ void CreateInvoice(groceryList * pList)
 
 void CalcInvoiceRowSummary()
 {
-	FILE *pfw = fopen("invoice.txt", "r+");
-	char tmp1[100],tmp2[20];
-	int len,lentotal=0, i = 0, j,k, num1; 
+	FILE *pfr = fopen("invoice.txt", "r+");
+	char tmp1[SIZE2], tmp2[20], c=0;
+	int lenInit = 0, lentotal = 0, i = 0, j, k, num1, size;
 	float sum, num2;
-	FILE *pfr = fopen("invoice.txt", "rt");
-	while (!feof(pfw))
+	FILE *pft = fopen("tmpfile.txt", "a+");
+	fseek(pfr, 0, SEEK_END);
+	int tempo=ftell(pfr);
+	fseek(pfr, 0, SEEK_SET);
+	while (!feof(pfr))
 	{
-		fgets(tmp1, 100, pfw);
-		//fseek(pf, 0, SEEK_SET);
-		len = strlen(tmp1);
-		lentotal += len;
-		//tmp1[len - 1] = ' ';
-		for (i = 0; tmp1[i]<'0' || tmp1[i]>'9'; i++);
-		j = 0;
-		while (tmp1[i] != ' ')
+		//fgets(tmp1, SIZE2, pfr);
+		//len = strlen(tmp1);
+		//lentotal += len;
+		//fseek(pfr, 1, SEEK_CUR);
+		//tmp1[len - 1] ='\0';
+
+		//skipping the name
+		while ( c<'0' || c>'9')
 		{
-			tmp2[j] = tmp1[i];
-			j++;
-			i++;
-		}
-		num1 = atoi(tmp2);
-		i++;
-		j = 0;
-		while (tmp1[i] !='\n')
-		{
-			tmp2[j] = tmp1[i];
-			j++;
-			i++;
-		}
-		tmp2[j] = '\0';
-		num2 = atof(tmp2);
-		sum = (float)num1 * num2;
-		fseek(pfw, lentotal-1, SEEK_SET);
-		fprintf(pfw, " %f\n",sum);
-		while (fgetc(pfw) != '\n')
-		{
-			fseek(pfw, 1, SEEK_CUR);
+			c = fgetc(pfr);
 			lentotal++;
 		}
+		fseek(pfr, -1, SEEK_CUR);
+		lentotal--; 
+		j = 0;
+
+		//getting the first number, quantity
+		while (c!= ' ')
+		{
+			c = fgetc(pfr);
+			tmp2[j] = c;
+			j++;
+			lentotal++;
+		}
+		tmp2[j - 1] = '\0';
+		num1 = atoi(tmp2);
+		j = 0;
+
+		//getting the 2nd num, price
+		while (c !='\n')
+		{
+			c = fgetc(pfr);
+			tmp2[j] = c;
+			lentotal++;
+			j++;
+		}
+		tmp2[j-1] = '\0';
+		num2 = atof(tmp2);
+		sum = (float)num1 * num2;
+		fseek(pfr, lenInit, SEEK_SET);
+		memcpy(pft, pfr, lentotal-1);
+		fflush(pft);
+		//fseek(pfr, lentotal-1, SEEK_SET);
+		fseek(pft, 0, SEEK_END);
+		fprintf(pft, " %f\n",sum);
+		lenInit = lentotal;
+		fflush(pft); //debug
+		//lentotal = ftell(pfr);
+		/*while (fgetc(pfr) != '\n')
+		{
+			fseek(pfr, 1, SEEK_CUR);
+			lentotal++;
+		}*/
 		
-		fseek(pfw, lentotal, SEEK_SET);
-		fflush(pfw);
+		//fseek(pfr, lentotal, SEEK_SET);
+		//fflush(pfr);
 	}
-	fclose(pfw);
+	fseek(pfr,0 , SEEK_SET);
+	size = ftell(pft);
+	fseek(pft, 0, SEEK_SET);
+	memcpy(pfr, pft, size);
+	fclose(pft);
 	fclose(pfr);
 	//להפוך את הסאם לסטרינג טמפ2 ולהוסיף לקובץ החדש אחרי טמפ1
 	//אחרי זה להפוך את כל הכתוב ללולאה שתבצע על כל שורה לא לשכוח לאפס את הסטרינגים
