@@ -1,4 +1,4 @@
-/*To do:
+﻿/*To do:
 -Special cases for every function
 -createInvoice- fputs doing problems
 -Debug*/
@@ -41,6 +41,7 @@ void main()
 	addGroceryItem(&pList);
 	addGroceryItem(&pList);
 	CreateInvoice(&pList);
+	CalcInvoiceRowSummary();
 	undo(&pList);
 	undo(&pList);
 	//free(&pList.listItems);
@@ -151,66 +152,119 @@ void CreateInvoice(groceryList * pList)
 	fclose(pf);
 }
 
-//Q1 d: This function summeries the item in every line
 void CalcInvoiceRowSummary()
 {
-	//maayan said that there is an example without another file, and we actually can create a new one
-
-
-
-	//Creating a opinter to the file
-	FILE *pf = fopen("invoice.txt", "r+");
-	char c;
-	int integer = 0, quantity, temp=TRUE;
-	float result = 0, pointFloat = 10;
-
-	//moving the cur to the start
-	//lalala
-	fseek(pf, 0, SEEK_SET);
-
-	//my idea is a loop that is active untill we are in the end of file (EOF)
-	//we are looking for '\n', then we will count the numbers and create them. we know that we will find 2 spaces
-	while (!feof(pf))
+	FILE *pfw = fopen("invoice.txt", "r+");
+	char tmp1[100],tmp2[20];
+	int len,lentotal=0, i = 0, j,k, num1; 
+	float sum, num2;
+	FILE *pfr = fopen("invoice.txt", "rt");
+	while (!feof(pfw))
 	{
-		//assuming the name has no numbers and digits
-		//if a number found
-		c = fgetc(pf);
-		while ((c <= '9' && c >= '0') || c == '.')
+		fgets(tmp1, 100, pfw);
+		//fseek(pf, 0, SEEK_SET);
+		len = strlen(tmp1);
+		lentotal += len;
+		//tmp1[len - 1] = ' ';
+		for (i = 0; tmp1[i]<'0' || tmp1[i]>'9'; i++);
+		j = 0;
+		while (tmp1[i] != ' ')
 		{
-			//decimal point found
-			if (c == '.')
-			{
-				//adding all the floating digits
-				while (c != '\n')
-				{
-					result += (float)c / pointFloat;
-					pointFloat *= 10;
-				}
-
-				result += (float)integer;
-				break;
-			}
-
-			integer = integer * 10 + (int)c;
-			fseek(pf, 1, SEEK_CUR);
-			c = fgetc(pf);
+			tmp2[j] = tmp1[i];
+			j++;
+			i++;
 		}
-
-		//if the quantity was calculated. Default is TRUE.
-		if (temp)
+		num1 = atoi(tmp2);
+		i++;
+		j = 0;
+		while (tmp1[i] !='\n')
 		{
-			quantity = integer;
-			temp = FALSE;
-			integer = 0;
+			tmp2[j] = tmp1[i];
+			j++;
+			i++;
 		}
-
-		//reaching the end of the line
-		if (c == '\n')
+		tmp2[j] = '\0';
+		num2 = atof(tmp2);
+		sum = (float)num1 * num2;
+		fseek(pfw, lentotal-1, SEEK_SET);
+		fprintf(pfw, " %f\n",sum);
+		while (fgetc(pfw) != '\n')
 		{
-			result *= (float)quantity;
+			fseek(pfw, 1, SEEK_CUR);
+			lentotal++;
 		}
-
-		fseek(pf, 1, SEEK_CUR);
+		
+		fseek(pfw, lentotal, SEEK_SET);
+		fflush(pfw);
 	}
-	
+	fclose(pfw);
+	fclose(pfr);
+	//להפוך את הסאם לסטרינג טמפ2 ולהוסיף לקובץ החדש אחרי טמפ1
+	//אחרי זה להפוך את כל הכתוב ללולאה שתבצע על כל שורה לא לשכוח לאפס את הסטרינגים
+
+
 }
+
+////Q1 d: This function summeries the item in every line
+//void CalcInvoiceRowSummary()
+//{
+//	//maayan said that there is an example without another file, and we actually can create a new one
+//
+//
+//
+//	//Creating a opinter to the file
+//	FILE *pf = fopen("invoice.txt", "r+");
+//	char c;
+//	int integer = 0, quantity, temp=TRUE;
+//	float result = 0, pointFloat = 10;
+//
+//	//moving the cur to the start
+//	//lalala
+//	fseek(pf, 0, SEEK_SET);
+//
+//	//my idea is a loop that is active untill we are in the end of file (EOF)
+//	//we are looking for '\n', then we will count the numbers and create them. we know that we will find 2 spaces
+//	while (!feof(pf))
+//	{
+//		//assuming the name has no numbers and digits
+//		//if a number found
+//		c = fgetc(pf);
+//		while ((c <= '9' && c >= '0') || c == '.')
+//		{
+//			//decimal point found
+//			if (c == '.')
+//			{
+//				//adding all the floating digits
+//				while (c != '\n')
+//				{
+//					result += (float)c / pointFloat;
+//					pointFloat *= 10;
+//				}
+//
+//				result += (float)integer;
+//				break;
+//			}
+//
+//			integer = integer * 10 + (int)c;
+//			fseek(pf, 1, SEEK_CUR);
+//			c = fgetc(pf);
+//		}
+//
+//		//if the quantity was calculated. Default is TRUE.
+//		if (temp)
+//		{
+//			quantity = integer;
+//			temp = FALSE;
+//			integer = 0;
+//		}
+//
+//		//reaching the end of the line
+//		if (c == '\n')
+//		{
+//			result *= (float)quantity;
+//		}
+//
+//		fseek(pf, 1, SEEK_CUR);
+//	}
+//	
+//}
