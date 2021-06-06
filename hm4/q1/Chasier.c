@@ -45,14 +45,6 @@ void main()
 	option = menu(&pList);
 	if (!option)
 		freeList(&pList);
-
-	addGroceryItem(&pList);
-	addGroceryItem(&pList);
-	CreateInvoice(&pList);
-	CalcInvoiceRowSummary();
-	undo(&pList);
-	undo(&pList);
-	//free(&pList.listItems);
 }
 
 
@@ -75,13 +67,14 @@ void freeList(groceryList * pList)
 char menu(groceryList * pList)
 {
 	//init
-	char option;
+	char option='1';
 
 	//prints all the options to the user, while option 1 and 2 will get the functions, 3 will get invoice and end the menu function
 	while(1)
 	{
-		printf("\n\t***Main Menu***\n1. Add Grocery Item\n2. Undo\n3.Finish and get Invoice\n");
-		scanf("%c", option);
+		printf("\n\t***Main Menu***\n1. Add Grocery Item\n2. Undo- Remove last item\n3.Finish and get Invoice\n");
+		fseek(stdin, 0, SEEK_END);
+		scanf("%c", &option);
 
 		switch (option)
 		{
@@ -93,14 +86,15 @@ char menu(groceryList * pList)
 		case '2':
 			printf("--Undo--\n");
 			undo(pList);
-			printf("Undo complete!\n");
 			continue;
 		case '3':
 			printf("--Finish and get Invoice--\nThank you! The invoice will be at your program folder...\n");
 			CreateInvoice(pList);
 			CalcInvoiceRowSummary(pList);
 			return NULL;
-		default: continue;
+		default: 
+			printf("Invalid Input! Please try again\n");
+			continue;
 		}
 	}
 }
@@ -143,10 +137,12 @@ void addGroceryItem(groceryList * pList)
 
 	//Input for quantity
 	printf("Please enter the quantity of the item: ");
+	fseek(stdin, 0, SEEK_END);
 	scanf("%d", &temp.quantity);
 
 	//Input for price
 	printf("Please enter the price of the item: ");
+	fseek(stdin, 0, SEEK_END);
 	scanf("%f", &temp.price);
 
 	strcpy(pList->listItems[pList->size-1]->itemsName,temp.itemsName);	
@@ -159,6 +155,12 @@ void addGroceryItem(groceryList * pList)
 /*Q1 b: The function gets a pointer to the list, deletes the last item on the list, freeing the memory of the item and reallocates the memory in a smaller size by 1*/
 void undo(groceryList * pList)
 {
+	if (pList->listItems[0] == NULL)
+	{
+		printf("The cart is already empty!\n");
+		return;
+	}
+
 	//freeing the last element in the list
 	free(pList->listItems[pList->size - 1]);
 	
@@ -178,6 +180,8 @@ void undo(groceryList * pList)
 
 	//if the list is empty, it will free the list
 	else free(pList->listItems);
+
+	printf("Undo complete!\n");
 }
 
 
@@ -221,10 +225,17 @@ void CalcInvoiceRowSummary()
 	if (!pft)
 		openFileFailed();
 
-	char c = 0, tmp[20];
+	char c = fgetc(pfr), tmp[20];
 	int  idx, num1;
 	float sum, num2;
 
+	//if the list is empty, will exit
+	if (c == -1)
+	{
+		printf("The cart is empty! There is nothing to print...\n");
+		exit(0);
+	}
+	
 	//setting the cur to the start
 	fseek(pfr, 0, SEEK_SET);
 
