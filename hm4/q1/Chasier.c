@@ -155,145 +155,76 @@ void CreateInvoice(groceryList * pList)
 
 void CalcInvoiceRowSummary()
 {
+	//init all vars
 	FILE *pfr = fopen("invoice.txt", "r+");
-	char tmp1[SIZE2], tmp2[20], c=0;
-	int lenInit = 0, lentotal = 0, i = 0, j, k, num1, size;
-	float sum, num2;
 	FILE *pft = fopen("tmpfile.txt", "a+");
-	fseek(pfr, 0, SEEK_END);
-	int tempo=ftell(pfr);
+	char c = 0, tmp[20];
+	int  idx, num1;
+	float sum, num2;
+
+	//setting the cur to the start
 	fseek(pfr, 0, SEEK_SET);
+
+	//while not at the end of the file
 	while (!feof(pfr))
 	{
-		//fgets(tmp1, SIZE2, pfr);
-		//len = strlen(tmp1);
-		//lentotal += len;
-		//fseek(pfr, 1, SEEK_CUR);
-		//tmp1[len - 1] ='\0';
-
 		//skipping the name
 		while ( c<'0' || c>'9')
 		{
 			c = fgetc(pfr);
-			lentotal++;
+			if(c<'0' || c>'9') fputc(c, pft);
 		}
+
+		//moving back to get the num
 		fseek(pfr, -1, SEEK_CUR);
-		lentotal--; 
-		j = 0;
+		idx = 0;
 
 		//getting the first number, quantity
 		while (c!= ' ')
 		{
 			c = fgetc(pfr);
-			tmp2[j] = c;
-			j++;
-			lentotal++;
+			fputc(c, pft);
+			tmp[idx] = c;
+			idx++;
 		}
-		tmp2[j - 1] = '\0';
-		num1 = atoi(tmp2);
-		j = 0;
+		tmp[idx - 1] = '\0';
+		num1 = atoi(tmp);
+		idx = 0;
 
 		//getting the 2nd num, price
 		while (c !='\n')
 		{
 			c = fgetc(pfr);
-			tmp2[j] = c;
-			lentotal++;
-			j++;
+			if(c!='\n') fputc(c, pft);
+			tmp[idx] = c;
+			idx++;
 		}
-		tmp2[j-1] = '\0';
-		num2 = atof(tmp2);
+		tmp[idx-1] = '\0';
+		num2 = atof(tmp);
 		sum = (float)num1 * num2;
-		fseek(pfr, lenInit, SEEK_SET);
-		memcpy(pft, pfr, lentotal-1);
-		fflush(pft);
-		//fseek(pfr, lentotal-1, SEEK_SET);
+
+		//moving to the end of the temp file, and printing to it
 		fseek(pft, 0, SEEK_END);
-		fprintf(pft, " %f\n",sum);
-		lenInit = lentotal;
-		fflush(pft); //debug
-		//lentotal = ftell(pfr);
-		/*while (fgetc(pfr) != '\n')
-		{
-			fseek(pfr, 1, SEEK_CUR);
-			lentotal++;
-		}*/
-		
-		//fseek(pfr, lentotal, SEEK_SET);
-		//fflush(pfr);
+		fprintf(pft, " %f\n",sum);		
+
+		//checking if we are at the end, if not then it will get the cur one step back, else the while will end
+		c = fgetc(pfr);
+		if (c!=-1)
+			fseek(pfr, -1, SEEK_CUR);
+
 	}
+
+	//moving both to the start
 	fseek(pfr,0 , SEEK_SET);
-	size = ftell(pft);
 	fseek(pft, 0, SEEK_SET);
-	memcpy(pfr, pft, size);
+
+	//copying all the content to the original
+	c = fgetc(pft);
+	while (!feof(pft))
+	{
+		fputc(c, pfr);
+		c = fgetc(pft);
+	}
 	fclose(pft);
 	fclose(pfr);
-	//להפוך את הסאם לסטרינג טמפ2 ולהוסיף לקובץ החדש אחרי טמפ1
-	//אחרי זה להפוך את כל הכתוב ללולאה שתבצע על כל שורה לא לשכוח לאפס את הסטרינגים
-
-
 }
-
-////Q1 d: This function summeries the item in every line
-//void CalcInvoiceRowSummary()
-//{
-//	//maayan said that there is an example without another file, and we actually can create a new one
-//
-//
-//
-//	//Creating a opinter to the file
-//	FILE *pf = fopen("invoice.txt", "r+");
-//	char c;
-//	int integer = 0, quantity, temp=TRUE;
-//	float result = 0, pointFloat = 10;
-//
-//	//moving the cur to the start
-//	//lalala
-//	fseek(pf, 0, SEEK_SET);
-//
-//	//my idea is a loop that is active untill we are in the end of file (EOF)
-//	//we are looking for '\n', then we will count the numbers and create them. we know that we will find 2 spaces
-//	while (!feof(pf))
-//	{
-//		//assuming the name has no numbers and digits
-//		//if a number found
-//		c = fgetc(pf);
-//		while ((c <= '9' && c >= '0') || c == '.')
-//		{
-//			//decimal point found
-//			if (c == '.')
-//			{
-//				//adding all the floating digits
-//				while (c != '\n')
-//				{
-//					result += (float)c / pointFloat;
-//					pointFloat *= 10;
-//				}
-//
-//				result += (float)integer;
-//				break;
-//			}
-//
-//			integer = integer * 10 + (int)c;
-//			fseek(pf, 1, SEEK_CUR);
-//			c = fgetc(pf);
-//		}
-//
-//		//if the quantity was calculated. Default is TRUE.
-//		if (temp)
-//		{
-//			quantity = integer;
-//			temp = FALSE;
-//			integer = 0;
-//		}
-//
-//		//reaching the end of the line
-//		if (c == '\n')
-//		{
-//			result *= (float)quantity;
-//		}
-//
-//		fseek(pf, 1, SEEK_CUR);
-//	}
-//	
-//}
