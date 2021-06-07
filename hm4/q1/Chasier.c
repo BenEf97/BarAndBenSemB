@@ -205,11 +205,12 @@ void CalcInvoiceRowSummary()
 		num2 = atof(tmp2);
 		sum = (float)num1 * num2;
 		fseek(pfr, lenInit, SEEK_SET);
-		memcpy(pft, pfr, lentotal-1);
-		fflush(pft);
+		fgets(tmp1,lentotal-1,pfr);
+		tmp1[lentotal - 2] = '\0';
+		//fflush(pft);
 		//fseek(pfr, lentotal-1, SEEK_SET);
 		fseek(pft, 0, SEEK_END);
-		fprintf(pft, " %f\n",sum);
+		fprintf(pft, "%s %f\n", tmp1, sum);
 		lenInit = lentotal;
 		fflush(pft); //debug
 		//lentotal = ftell(pfr);
@@ -219,7 +220,7 @@ void CalcInvoiceRowSummary()
 			lentotal++;
 		}*/
 		
-		//fseek(pfr, lentotal, SEEK_SET);
+		fseek(pfr, lenInit+1, SEEK_SET);
 		//fflush(pfr);
 	}
 	fseek(pfr,0 , SEEK_SET);
