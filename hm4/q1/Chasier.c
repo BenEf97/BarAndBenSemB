@@ -1,16 +1,8 @@
-﻿/*To do:
--Special cases for every function
--createInvoice- fputs doing problems
--Debug*/
-
-
-#define _CRT_SECURE_NO_WARNINGS
+﻿#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #define SIZE 80
-#define TRUE 1
-#define FALSE 0
 #define SIZE2 100
 
 typedef struct groceryItem
@@ -32,20 +24,73 @@ void CreateInvoice(groceryList * pList);
 void CalcInvoiceRowSummary();
 void allocationFail();
 void openFileFailed();
+char menu(groceryList * pList);
+void freeList(groceryList * pList);
 
 void main()
 {
 	//debug
+
+	//init
 	groceryList pList;
+	char option;
 	pList.listItems = (groceryItem**)calloc(1, sizeof(groceryItem));
 	pList.size = 0;
-	addGroceryItem(&pList);
-	addGroceryItem(&pList);
-	CreateInvoice(&pList);
-	CalcInvoiceRowSummary();
-	undo(&pList);
-	undo(&pList);
-	//free(&pList.listItems);
+	option = menu(&pList);
+	if (!option)
+		freeList(&pList);
+}
+
+
+//free the list
+void freeList(groceryList * pList)
+{
+	//the list is already empty
+	if (!pList->listItems)
+		return;
+
+	//free all the data in the list
+	for (int idx = 0; idx < pList->size; idx++)
+	{
+		free(pList->listItems[idx]);
+	}
+	free(pList->listItems);
+}
+
+//Q1 e: main menu
+char menu(groceryList * pList)
+{
+	//init
+	char option='1';
+
+	//prints all the options to the user, while option 1 and 2 will get the functions, 3 will get invoice and end the menu function
+	while(1)
+	{
+		printf("\n\t***Main Menu***\n1. Add Grocery Item\n2. Undo- Remove last item\n3.Finish and get Invoice\n");
+		fseek(stdin, 0, SEEK_END);
+		scanf("%c", &option);
+
+		switch (option)
+		{
+		case '1':
+			printf("--Add Grocery Item--\n");
+			addGroceryItem(pList);
+			printf("The item has been added!\n");
+			continue;
+		case '2':
+			printf("--Undo--\n");
+			undo(pList);
+			continue;
+		case '3':
+			printf("--Finish and get Invoice--\nThank you! The invoice will be at your program folder...\n");
+			CreateInvoice(pList);
+			CalcInvoiceRowSummary(pList);
+			return NULL;
+		default: 
+			printf("Invalid Input! Please try again\n");
+			continue;
+		}
+	}
 }
 
 
@@ -86,10 +131,12 @@ void addGroceryItem(groceryList * pList)
 
 	//Input for quantity
 	printf("Please enter the quantity of the item: ");
+	fseek(stdin, 0, SEEK_END);
 	scanf("%d", &temp.quantity);
 
 	//Input for price
 	printf("Please enter the price of the item: ");
+	fseek(stdin, 0, SEEK_END);
 	scanf("%f", &temp.price);
 
 	strcpy(pList->listItems[pList->size-1]->itemsName,temp.itemsName);	
@@ -102,6 +149,12 @@ void addGroceryItem(groceryList * pList)
 /*Q1 b: The function gets a pointer to the list, deletes the last item on the list, freeing the memory of the item and reallocates the memory in a smaller size by 1*/
 void undo(groceryList * pList)
 {
+	if (pList->listItems[0] == NULL)
+	{
+		printf("The cart is already empty!\n");
+		return;
+	}
+
 	//freeing the last element in the list
 	free(pList->listItems[pList->size - 1]);
 	
@@ -121,6 +174,8 @@ void undo(groceryList * pList)
 
 	//if the list is empty, it will free the list
 	else free(pList->listItems);
+
+	printf("Undo complete!\n");
 }
 
 
@@ -155,146 +210,91 @@ void CreateInvoice(groceryList * pList)
 
 void CalcInvoiceRowSummary()
 {
+	//init all vars
 	FILE *pfr = fopen("invoice.txt", "r+");
-	char tmp1[SIZE2], tmp2[20], c=0;
-	int lenInit = 0, lentotal = 0, i = 0, j, k, num1, size;
-	float sum, num2;
+	if (!pfr)
+		openFileFailed();
+
 	FILE *pft = fopen("tmpfile.txt", "a+");
-	fseek(pfr, 0, SEEK_END);
-	int tempo=ftell(pfr);
+	if (!pft)
+		openFileFailed();
+
+	char c = fgetc(pfr), tmp[20];
+	int  idx, num1;
+	float sum, num2;
+
+	//if the list is empty, will exit
+	if (c == -1)
+	{
+		printf("The cart is empty! There is nothing to print...\n");
+		exit(0);
+	}
+	
+	//setting the cur to the start
 	fseek(pfr, 0, SEEK_SET);
+
+	//while not at the end of the file
 	while (!feof(pfr))
 	{
-		//fgets(tmp1, SIZE2, pfr);
-		//len = strlen(tmp1);
-		//lentotal += len;
-		//fseek(pfr, 1, SEEK_CUR);
-		//tmp1[len - 1] ='\0';
-
 		//skipping the name
 		while ( c<'0' || c>'9')
 		{
 			c = fgetc(pfr);
-			lentotal++;
+			if(c<'0' || c>'9') fputc(c, pft);
 		}
+
+		//moving back to get the num
 		fseek(pfr, -1, SEEK_CUR);
-		lentotal--; 
-		j = 0;
+		idx = 0;
 
 		//getting the first number, quantity
 		while (c!= ' ')
 		{
 			c = fgetc(pfr);
-			tmp2[j] = c;
-			j++;
-			lentotal++;
+			fputc(c, pft);
+			tmp[idx] = c;
+			idx++;
 		}
-		tmp2[j - 1] = '\0';
-		num1 = atoi(tmp2);
-		j = 0;
+		tmp[idx - 1] = '\0';
+		num1 = atoi(tmp);
+		idx = 0;
 
 		//getting the 2nd num, price
 		while (c !='\n')
 		{
 			c = fgetc(pfr);
-			tmp2[j] = c;
-			lentotal++;
-			j++;
+			if(c!='\n') fputc(c, pft);
+			tmp[idx] = c;
+			idx++;
 		}
-		tmp2[j-1] = '\0';
-		num2 = atof(tmp2);
+		tmp[idx-1] = '\0';
+		num2 = atof(tmp);
 		sum = (float)num1 * num2;
-		fseek(pfr, lenInit, SEEK_SET);
-		fgets(tmp1,lentotal-1,pfr);
-		tmp1[lentotal - 2] = '\0';
-		//fflush(pft);
-		//fseek(pfr, lentotal-1, SEEK_SET);
+
+		//moving to the end of the temp file, and printing to it
 		fseek(pft, 0, SEEK_END);
-		fprintf(pft, "%s %f\n", tmp1, sum);
-		lenInit = lentotal;
-		fflush(pft); //debug
-		//lentotal = ftell(pfr);
-		/*while (fgetc(pfr) != '\n')
-		{
-			fseek(pfr, 1, SEEK_CUR);
-			lentotal++;
-		}*/
-		
-		fseek(pfr, lenInit+1, SEEK_SET);
-		//fflush(pfr);
+		fprintf(pft, " %f\n",sum);		
+
+		//checking if we are at the end, if not then it will get the cur one step back, else the while will end
+		c = fgetc(pfr);
+		if (c!=-1)
+			fseek(pfr, -1, SEEK_CUR);
+
 	}
+
+	//moving both to the start
 	fseek(pfr,0 , SEEK_SET);
-	size = ftell(pft);
 	fseek(pft, 0, SEEK_SET);
-	memcpy(pfr, pft, size);
+
+	//copying all the content to the original
+	c = fgetc(pft);
+	while (!feof(pft))
+	{
+		fputc(c, pfr);
+		c = fgetc(pft);
+	}
+
+	//closing the files
 	fclose(pft);
 	fclose(pfr);
-	//להפוך את הסאם לסטרינג טמפ2 ולהוסיף לקובץ החדש אחרי טמפ1
-	//אחרי זה להפוך את כל הכתוב ללולאה שתבצע על כל שורה לא לשכוח לאפס את הסטרינגים
-
-
 }
-
-////Q1 d: This function summeries the item in every line
-//void CalcInvoiceRowSummary()
-//{
-//	//maayan said that there is an example without another file, and we actually can create a new one
-//
-//
-//
-//	//Creating a opinter to the file
-//	FILE *pf = fopen("invoice.txt", "r+");
-//	char c;
-//	int integer = 0, quantity, temp=TRUE;
-//	float result = 0, pointFloat = 10;
-//
-//	//moving the cur to the start
-//	//lalala
-//	fseek(pf, 0, SEEK_SET);
-//
-//	//my idea is a loop that is active untill we are in the end of file (EOF)
-//	//we are looking for '\n', then we will count the numbers and create them. we know that we will find 2 spaces
-//	while (!feof(pf))
-//	{
-//		//assuming the name has no numbers and digits
-//		//if a number found
-//		c = fgetc(pf);
-//		while ((c <= '9' && c >= '0') || c == '.')
-//		{
-//			//decimal point found
-//			if (c == '.')
-//			{
-//				//adding all the floating digits
-//				while (c != '\n')
-//				{
-//					result += (float)c / pointFloat;
-//					pointFloat *= 10;
-//				}
-//
-//				result += (float)integer;
-//				break;
-//			}
-//
-//			integer = integer * 10 + (int)c;
-//			fseek(pf, 1, SEEK_CUR);
-//			c = fgetc(pf);
-//		}
-//
-//		//if the quantity was calculated. Default is TRUE.
-//		if (temp)
-//		{
-//			quantity = integer;
-//			temp = FALSE;
-//			integer = 0;
-//		}
-//
-//		//reaching the end of the line
-//		if (c == '\n')
-//		{
-//			result *= (float)quantity;
-//		}
-//
-//		fseek(pf, 1, SEEK_CUR);
-//	}
-//	
-//}
