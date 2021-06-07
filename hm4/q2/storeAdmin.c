@@ -18,12 +18,12 @@ void openFileFailed();
 void main()
 {
 
-	groceryItem debug = { "A",2,5.5 };
+	groceryItem debug = { "Avocado",2,5.5 };
 	printStock("stock.dat");
 	addGroceryItem("stock.dat",&debug.itemsName,debug.quantity,debug.price);
 	printf("\n");
 	printStock("stock.dat");
-}
+ }
 
 //If file opening fails, the user will get output and the program will exit.
 void openFileFailed()
@@ -71,6 +71,7 @@ void addGroceryItem(char* StorageFile, char* productName, int quantity, float pr
 	int numOfByte, count = 0, sum;
 	fseek(pf, 0, SEEK_END);
 	sum = ftell(pf) / sizeof(groceryItem);
+	printf("\ntest***%d***\n", sum);
 	fseek(pf, 0, SEEK_SET);
 
 
@@ -88,7 +89,6 @@ void addGroceryItem(char* StorageFile, char* productName, int quantity, float pr
 			return;
 		}
 
-
 		if (strcmp(stk.itemsName, productName) > 0)
 		{
 			numOfByte = sizeof(groceryItem);
@@ -97,36 +97,68 @@ void addGroceryItem(char* StorageFile, char* productName, int quantity, float pr
 			tmp1.quantity = quantity;
 			tmp1.price = price;
 			
-
-			while (1)
+			//if the item is in the middle
+			if (count > 1 && count < sum)
 			{
-				if (count == sum + 1)
+				while (1)
+				{
+					if (count > sum)
+					{
+						fwrite(&tmp1, sizeof(groceryItem), 1, pf);
+						break;
+					}
+					fread(&tmp2, sizeof(groceryItem), 1, pf);
+					fseek(pf, -numOfByte, SEEK_CUR);
+					fwrite(&tmp1, sizeof(groceryItem), 1, pf);
+					count++;
+					if (count > sum)
+					{
+						fwrite(&tmp2, sizeof(groceryItem), 1, pf);
+						break;
+					}
+					fread(&tmp1, sizeof(groceryItem), 1, pf);
+					fseek(pf, -numOfByte, SEEK_CUR);
+					fwrite(&tmp2, sizeof(groceryItem), 1, pf);
+					count++;
+				}
+				fclose(pf);
+				return;
+			}
+			//if the item is the first item
+			if (count = 1) 
+			{
+				fseek(pf, 0, SEEK_SET);
+				FILE *tmpfirst = fopen("tmpfirst.dat", "ab+");
+				fwrite(&tmp1, sizeof(groceryItem), 1, tmpfirst);
+				while (fread(&tmp1, sizeof(groceryItem), 1, pf) == 1)
+				{
+					fwrite(&tmp1, sizeof(groceryItem), 1, tmpfirst);
+					count++;
+				}
+				fseek(pf, 0, SEEK_SET);
+				fseek(tmpfirst, 0, SEEK_SET);
+				while (fread(&tmp1, sizeof(groceryItem), 1, tmpfirst) == 1)
 				{
 					fwrite(&tmp1, sizeof(groceryItem), 1, pf);
-					break;
 				}
-				fread(&tmp2, sizeof(groceryItem), 1, pf);
-				fseek(pf, -numOfByte, SEEK_CUR);
-				fwrite(&tmp1, sizeof(groceryItem), 1, pf);
-				count++;
-				if (count == sum+1)
-				{
-					fwrite(&tmp2, sizeof(groceryItem), 1, pf);
-					break;
-				}
-				fread(&tmp1, sizeof(groceryItem), 1, pf);
-				fseek(pf, -numOfByte, SEEK_CUR);
-				fwrite(&tmp2, sizeof(groceryItem), 1, pf);
-				count++;
+				
+				fclose(pf);
+				fclose(tmpfirst);
+				return;
 			}
-			fclose(pf);
-			return;
+			
 		}
 
 	}
-
-	//adding a new product
-
-	fclose(pf);
-
+	//if its the last item
+	if (count >= sum)
+	{
+		strcpy(tmp1.itemsName, productName);
+		tmp1.quantity = quantity;
+		tmp1.price = price;
+		fseek(pf, 0, SEEK_END);
+		fwrite(&tmp1, sizeof(groceryItem), 1, pf);
+		fclose(pf);
+		return;
+	}
 }
