@@ -30,7 +30,6 @@ void freeList(groceryList * pList);
 
 void main()
 {
-	//debug
 
 	//init
 	groceryList pList;

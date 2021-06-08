@@ -106,7 +106,7 @@ void printStock(char* StorageFile)
 }
 
 
-//Q2 b:
+//Q2 b: adds an item to the stock file, if already exits then it will be updated
 void addGroceryItem(char* StorageFile, char* productName, int quantity, float price)
 {
 	//Init, opening the file, if fails will output error
