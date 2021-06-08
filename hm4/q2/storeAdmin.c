@@ -17,19 +17,17 @@ void openFileFailed();
 
 void main(int argc, char *argv[])
 {
-	//test
-	printf("argc=%d\n", argc);
-	for (int i = 0; i < argc; i++)
-		printf("argv[%d]= %s\n", i, argv[i]);
-	//system("pause");
+	////debug: displays all the arguments
+	//printf("argc=%d\n", argc);
+	//for (int i = 0; i < argc; i++)
+	//	printf("argv[%d]= %s\n", i, argv[i]);
+	////system("pause");
+
+	//argv[1]- operation (a/p) ,argv[2]- inventory file name, argv[3]- product name, argv[4]-quantity, argv[5]-price
 
 	//Checking arguments
 	if (argv[1][0] == 'a' || argv[1][0] == 'p')
 	{
-		/*
-		argv[1]- operation (a/p) ,argv[2]- inventory file name, argv[3]- product name, argv[4]-quantity, argv[5]-price
-		*/
-
 		switch (argv[1][0])
 		{
 		//print the stock file
@@ -41,6 +39,7 @@ void main(int argc, char *argv[])
 				printf("ERROR! invalid number of elements entered!\nExiting program...");
 				exit(1);
 			}
+			//function call to print the stock
 			printStock(argv[2]);
 			break;
 
@@ -53,8 +52,10 @@ void main(int argc, char *argv[])
 				printf("ERROR! invalid number of elements entered!\nExiting program...");
 				exit(1);
 			}
-			addGroceryItem(argv[2], argv[3], atoi(argv[4]), atof(argv[5]));
 
+			//function call to add grocery
+			addGroceryItem(argv[2], argv[3], atoi(argv[4]), atof(argv[5]));
+			break;
 		}
 	}
 
@@ -104,35 +105,50 @@ void printStock(char* StorageFile)
 	fclose(pf);
 }
 
+
+//Q2 b:
 void addGroceryItem(char* StorageFile, char* productName, int quantity, float price)
 {
+	//Init, opening the file, if fails will output error
 	FILE *pf = fopen(StorageFile, "rb+");
 	if (!pf)
 		openFileFailed();
+
 	groceryItem stk,tmp1,tmp2;
 	int numOfByte, count = 0, sum;
+
+	//getting the size of the file
 	fseek(pf, 0, SEEK_END);
 	sum = ftell(pf) / sizeof(groceryItem);
-	printf("\ntest***%d***\n", sum);
+
+	//moving back to the start
 	fseek(pf, 0, SEEK_SET);
 
 
-	//checking if the product is already in stock
+	//getting the data and the location for the incoming product
 	while (fread(&stk, sizeof(groceryItem), 1, pf) == 1)
 	{
+		//count bigger by one
 		count++;
-		//matching name
+
+		//if the product is already in stock
 		if (!strcmp(stk.itemsName, productName)) {
+			
+			//getting the number of bytes for each step, and moving one step backwards from the current position
 			numOfByte = sizeof(groceryItem);
 			fseek(pf, -numOfByte, SEEK_CUR);
+
+			//quantity increase by the incoming count, and rewriting the value. Then return to main
 			stk.quantity += quantity;
 			fwrite(&stk, sizeof(groceryItem), 1, pf);
 			fclose(pf);
 			return;
 		}
 
+		//if the product name needs to be sorted in the exsiting stock
 		if (strcmp(stk.itemsName, productName) > 0)
 		{
+			//getting the size for each step, and getting the incoming data to tmp1
 			numOfByte = sizeof(groceryItem);
 			fseek(pf, (-1)*numOfByte, SEEK_CUR);
 			strcpy(tmp1.itemsName, productName);
@@ -142,50 +158,72 @@ void addGroceryItem(char* StorageFile, char* productName, int quantity, float pr
 			//if the item is in the middle
 			if (count > 1 && count < sum)
 			{
+				//endless loop untill return or break
 				while (1)
 				{
-					if (count > sum)
+					if (count > sum) //exit condition
 					{
 						fwrite(&tmp1, sizeof(groceryItem), 1, pf);
 						break;
 					}
+					//sorting the data alphabeticly
 					fread(&tmp2, sizeof(groceryItem), 1, pf);
 					fseek(pf, -numOfByte, SEEK_CUR);
 					fwrite(&tmp1, sizeof(groceryItem), 1, pf);
 					count++;
-					if (count > sum)
+					if (count > sum) //exit condioton
 					{
 						fwrite(&tmp2, sizeof(groceryItem), 1, pf);
 						break;
 					}
+					//sorting once again
 					fread(&tmp1, sizeof(groceryItem), 1, pf);
 					fseek(pf, -numOfByte, SEEK_CUR);
 					fwrite(&tmp2, sizeof(groceryItem), 1, pf);
 					count++;
 				}
+				//closing the file and returning
 				fclose(pf);
 				return;
 			}
 			//if the item is the first item
-			if (count = 1) 
+			if (count == 1) 
 			{
+				//moving to the start, opening a temporary file for help
 				fseek(pf, 0, SEEK_SET);
-				FILE *tmpfirst = fopen("tmpfirst.dat", "ab+");
+				FILE *tmpfirst = fopen("tmpfirst.dat", "wb+");
+				
+				//if opening fails
+				if (!tmpfirst)
+					openFileFailed();
+				
+				//copying the data to the tmp file
 				fwrite(&tmp1, sizeof(groceryItem), 1, tmpfirst);
 				while (fread(&tmp1, sizeof(groceryItem), 1, pf) == 1)
 				{
 					fwrite(&tmp1, sizeof(groceryItem), 1, tmpfirst);
-					count++;
 				}
+
+				//moving back to the start
 				fseek(pf, 0, SEEK_SET);
 				fseek(tmpfirst, 0, SEEK_SET);
+
+				//copying to the original file
 				while (fread(&tmp1, sizeof(groceryItem), 1, tmpfirst) == 1)
 				{
 					fwrite(&tmp1, sizeof(groceryItem), 1, pf);
 				}
 				
+				//closing the files
 				fclose(pf);
 				fclose(tmpfirst);
+				//removing the tmp file, if fails it will reopen and reset it
+				if (remove("tempfirst.dat") != 0)
+				{
+					//reseting the file
+					tmpfirst = fopen("tmpfirst.dat", "wb+");
+					fclose(tmpfirst);
+				}
 				return;
 			}
 			

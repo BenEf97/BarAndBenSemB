@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 #define SIZE 80
-#define SIZE2 100
 
+//structs
 typedef struct groceryItem
 {
 	char itemsName[SIZE];
@@ -18,6 +18,7 @@ typedef struct groceryList
 	int size;
 }groceryList;
 
+//fucntion list
 void addGroceryItem(groceryList * pList);
 void undo(groceryList * pList);
 void CreateInvoice(groceryList * pList);
@@ -34,8 +35,14 @@ void main()
 	//init
 	groceryList pList;
 	char option;
+
+	//allocation memory, if fails will exit
 	pList.listItems = (groceryItem**)calloc(1, sizeof(groceryItem));
+	if (pList.listItems == NULL)
+		allocationFail();
+
 	pList.size = 0;
+	//call for menu
 	option = menu(&pList);
 	if (!option)
 		freeList(&pList);
@@ -149,7 +156,7 @@ void addGroceryItem(groceryList * pList)
 /*Q1 b: The function gets a pointer to the list, deletes the last item on the list, freeing the memory of the item and reallocates the memory in a smaller size by 1*/
 void undo(groceryList * pList)
 {
-	if (pList->listItems[0] == NULL)
+	if (pList->listItems[0] == NULL ||pList->size==0)
 	{
 		printf("The cart is already empty!\n");
 		return;
@@ -173,7 +180,11 @@ void undo(groceryList * pList)
 	}
 
 	//if the list is empty, it will free the list
-	else free(pList->listItems);
+	else
+	{
+		free(pList->listItems);
+		pList->listItems == NULL;
+	}
 
 	printf("Undo complete!\n");
 }
@@ -215,7 +226,7 @@ void CalcInvoiceRowSummary()
 	if (!pfr)
 		openFileFailed();
 
-	FILE *pft = fopen("tmpfile.txt", "a+");
+	FILE *pft = fopen("tmpfile.txt", "w+");
 	if (!pft)
 		openFileFailed();
 
@@ -294,7 +305,14 @@ void CalcInvoiceRowSummary()
 		c = fgetc(pft);
 	}
 
-	//closing the files
+	//closing the files, and removing the tmpfile
 	fclose(pft);
 	fclose(pfr);
+	//if the remove fails it will reopen and close to reset the file
+	if (remove("tmpfile.txt") != 0)
+	{
+		pft=fopen("tmpfile.txt", "w");
+		fclose(pft);
+	}
+
 }
