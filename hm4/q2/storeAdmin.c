@@ -15,15 +15,57 @@ void printStock(char* StorageFile);
 void addGroceryItem(char* StorageFile, char* productName, int quantity, float price);
 void openFileFailed();
 
-void main()
+void main(int argc, char *argv[])
 {
+	//test
+	printf("argc=%d\n", argc);
+	for (int i = 0; i < argc; i++)
+		printf("argv[%d]= %s\n", i, argv[i]);
+	//system("pause");
 
-	groceryItem debug = { "Avocado",2,5.5 };
-	printStock("stock.dat");
-	addGroceryItem("stock.dat",&debug.itemsName,debug.quantity,debug.price);
-	printf("\n");
-	printStock("stock.dat");
- }
+	//Checking arguments
+	if (argv[1][0] == 'a' || argv[1][0] == 'p')
+	{
+		/*
+		argv[1]- operation (a/p) ,argv[2]- inventory file name, argv[3]- product name, argv[4]-quantity, argv[5]-price
+		*/
+
+		switch (argv[1][0])
+		{
+		//print the stock file
+		case 'p':
+
+			//if the number of arguments is inaccurate, the program will exit
+			if (argc != 3)
+			{
+				printf("ERROR! invalid number of elements entered!\nExiting program...");
+				exit(1);
+			}
+			printStock(argv[2]);
+			break;
+
+		//add grocery
+		case 'a':
+
+			//if the number of arguments is inaccurate, the program will exit
+			if (argc != 6)
+			{
+				printf("ERROR! invalid number of elements entered!\nExiting program...");
+				exit(1);
+			}
+			addGroceryItem(argv[2], argv[3], atoi(argv[4]), atof(argv[5]));
+
+		}
+	}
+
+	//if the value is invalid, an output will be displayed and it will exit the program
+	else
+	{
+		printf("ERROR! invalid elements entered!\nExiting program...");
+		exit(1);
+	}
+	system("pause");
+}
 
 //If file opening fails, the user will get output and the program will exit.
 void openFileFailed()
@@ -67,7 +109,7 @@ void addGroceryItem(char* StorageFile, char* productName, int quantity, float pr
 	FILE *pf = fopen(StorageFile, "rb+");
 	if (!pf)
 		openFileFailed();
-	groceryItem stk,tmp1,tmp2,in;
+	groceryItem stk,tmp1,tmp2;
 	int numOfByte, count = 0, sum;
 	fseek(pf, 0, SEEK_END);
 	sum = ftell(pf) / sizeof(groceryItem);
