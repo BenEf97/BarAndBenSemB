@@ -1,25 +1,25 @@
-
-#define _CRT_SECURE_NO_WARNINGS
+ï»¿#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 //struct of the tree
-typedef struct node {
+typedef struct Node {
 	int data;
-	struct node* left;
-	struct node* right;
+	struct Node* left;
+	struct Node* right;
 } Node;
 
 
 typedef struct
 {
-    Node* root;
+	Node* root;
 }BST;
 
 void insertBST(BST* bst, int data);
 void insertNode(Node* node, int data);
 void printInOrder(Node* node);
+
 Node* createNode(int data);
 void printBst(BST* bst);
 void allocationFail(Node* node);
@@ -34,13 +34,13 @@ void main()
 	insertBST(&bst, 4);//right for 2;
 	insertBST(&bst, 9);//right for 8;
 
-	//printBst(&bst);
+	printBst(&bst);
 
 }
 
 
-//ãâùéí: äáï äùîàìé úîéã ÷èï àå ùååä ìäåøä, äéîðé úîéã âãåì îääåøä
-//ôåð÷öéú äîòèôú öøéëä ì÷áì àú äîáðä äîðäì åîùí ìäùúîù áôåð÷öúéú òæø ø÷åøñéáéú
+//Ã£Ã¢Ã¹Ã©Ã­: Ã¤Ã¡Ã¯ Ã¤Ã¹Ã®Ã Ã¬Ã© ÃºÃ®Ã©Ã£ Ã·Ã¨Ã¯ Ã Ã¥ Ã¹Ã¥Ã¥Ã¤ Ã¬Ã¤Ã¥Ã¸Ã¤, Ã¤Ã©Ã®Ã°Ã© ÃºÃ®Ã©Ã£ Ã¢Ã£Ã¥Ã¬ Ã®Ã¤Ã¤Ã¥Ã¸Ã¤
+//Ã´Ã¥Ã°Ã·Ã¶Ã©Ãº Ã¤Ã®Ã²Ã¨Ã´Ãº Ã¶Ã¸Ã©Ã«Ã¤ Ã¬Ã·Ã¡Ã¬ Ã Ãº Ã¤Ã®Ã¡Ã°Ã¤ Ã¤Ã®Ã°Ã¤Ã¬ Ã¥Ã®Ã¹Ã­ Ã¬Ã¤Ã¹ÃºÃ®Ã¹ Ã¡Ã´Ã¥Ã°Ã·Ã¶ÃºÃ©Ãº Ã²Ã¦Ã¸ Ã¸Ã·Ã¥Ã¸Ã±Ã©Ã¡Ã©Ãº
 //Create new Node for the tree, gets the data, and left and right nodes
 void insertBST(BST* bst, int data)
 {
@@ -79,26 +79,37 @@ Node* createNode(int data)
 	allocationFail(newNode);
 	newNode->data = data;
 	return newNode;
-}//In case of failed memory allocation, the user will get an output and the program will exit
+}
+
+//In case of failed memory allocation, the user will get an output and the program will exit
 void allocationFail(Node* node)
 {
-	if (node == NULL) 
+	if (node == NULL)
 	{
 		printf("Out of memory! Exiting the program!\n");
 		exit(1);
 	}
 }
-//assist function for print managervoid printInOrder(Node* node) {
-	if (node == NULL) return;
-	printInOrder(node->left);
-	printf(" %d",node->data);
-	printInOrder(node->right);
-}
 
-////print manager //void printBst(BST* bst)//{//	if (bst == NULL)
-//	{
-//		printf("There is nothing to print");
-//		return;
-//	}
-//	printInOrder(bst->root);
-//}//
+////assist function for print manager
+void printInOrder(Node* node)
+{
+	if (node == NULL)
+		return;
+	printInOrder(node->left);
+	printf(" %d", node->data);
+	printInOrder(node->right);
+}
+
+
+//print manager 
+void printBst(BST* bst)
+{
+	if (bst == NULL)
+	{
+		printf("There is nothing to print");
+		return;
+	}
+	printInOrder(bst->root);
+}
+
