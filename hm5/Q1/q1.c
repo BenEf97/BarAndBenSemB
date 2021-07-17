@@ -22,26 +22,46 @@ void printInOrder(Node* node);
 Node* createNode(int data);
 void printBst(BST* bst);
 void allocationFail(Node* node);
-int nValueBst(BST* bst, int n);
-Node* nValue(Node* node, int* n);
+//int nValueBst(BST* bst, int n);
+//int nValue(Node* node, int n);
+int levelSearch(Node* node);
+int levelSearchBst(BST* bst);
+int treeCompBst(BST* bst1, BST* bst2);
+int treeComp(Node* node1, Node* node2);
+int getLevelBst(BST* bst1, BST* bst2, int data);
+int getLevel(Node *node, int data);
+int getLevelUtil(Node *node, int data, int level);
 
 void main()
 {
-	BST bst = { NULL };
-	insertBST(&bst, 5); //is root
-	insertBST(&bst, 2);//left for 5
-	insertBST(&bst, 8);//right for 5
-	insertBST(&bst, 1);//left for 2
-	insertBST(&bst, 4);//right for 2;
-	insertBST(&bst, 9);//right for 8;
-	insertBST(&bst, 10);
-	insertBST(&bst, 11);
-	printBst(&bst);
-	int n = 3;
-	printf("\nThe value after %d elements is %d",n, nValueBst(&bst, n));
-	n = 6;
-	printf("\nThe value after %d elements is %d", n, nValueBst(&bst, n));
+	BST bst1 = { NULL };
+	BST bst2 = { NULL };
+	insertBST(&bst1, 5); //is root
+	insertBST(&bst1, 2);//left for 5
+	insertBST(&bst1, 8);//right for 5
+	insertBST(&bst1, 1);//left for 2
+	insertBST(&bst1, 4);//right for 2;
+	insertBST(&bst1, 11);//right for 8;
 
+
+	insertBST(&bst2, 5); //is root
+	insertBST(&bst2, 2);//left for 5
+	insertBST(&bst2, 8);//right for 5
+	insertBST(&bst2, 1);//left for 2
+	insertBST(&bst2, 4);//right for 2;
+	insertBST(&bst2, 9);//right for 8;
+	printBst(&bst1);
+	int n = 3;
+	//printf("\nThe value after %d elements is %d",n, nValueBst(&bst, n));
+	printf("\n%d", levelSearchBst(&bst1));
+	if (treeCompBst(&bst1,&bst2)) printf("\nare the same");
+	else printf("\nnot the same\n");
+	if (getLevelBst(&bst1, &bst2, 4))
+	printf("True\n");
+	else printf("False\n");
+	if (getLevelBst(&bst1,&bst2,9))
+	printf("True\n");
+	else printf("False\n");
 
 }
 
@@ -167,7 +187,7 @@ Node* nValue(Node* node, int* n)
 }
 */ 
 
-
+/*
 //try fand failed
 int nValue(Node* node,int n,int count)
 {
@@ -184,11 +204,11 @@ int nValue(Node* node,int n,int count)
 		return res;
 	}
 	else return count;
-}
+}*/
 
 
 
-
+/*
 int nValueBst(BST* bst, int n)
 {
 	int count=1;
@@ -200,7 +220,7 @@ int nValueBst(BST* bst, int n)
 	Node* node=nValue(bst->root, n,count);
 	return node->data;
 }
-
+*/
 
 
 int levelSearchBst(BST* bst)
@@ -212,32 +232,91 @@ int levelSearchBst(BST* bst)
 		return 0;
 	}
 
-	}
-}
-
-int levelSearch(Node* node, int rec,int count)
-{
-	if (node==NULL)
+	int right = levelSearch(bst->root->right);
+	int left = levelSearch(bst->root->left);
+	if(left==right) 
 	return 1;
-	if (count<=rec)
-	{
-	int left=levelSearch(node->left,rec+1,count+1);
-	}
-	
-
-
+	else return 0;
 }
 
-int heightRec(Node* node)
+
+int levelSearch(Node* node)
 {
     if (!node)
         return 0;
-    if (!node->left&&!node->right->right)
+    if (!node->left&&!node->right)
         return 0;
-    int left=heightRec(node->left);
-    int right=heightrec(node->right);
+    int left=levelSearch(node->left);
+    int right=levelSearch(node->right);
 
     if (left<right)
         return right+1;
     else return left+1;
+}
+
+int treeCompBst(BST* bst1,BST* bst2)
+{
+	if (!bst1 || !bst2)
+	{
+		printf("One of the trees is invalid!\n");
+		return 0;
+	}
+	return treeComp(bst1->root, bst2->root);
+}
+
+int treeComp(Node* node1, Node* node2)
+{
+	// Check if both the trees are empty
+	if (node1 == NULL && node2 == NULL)
+		return 1;
+	// If any one of the tree is non-empty
+	// and other is empty, return false
+	else if (node1 != NULL && node2 == NULL)
+		return 0;
+	else if (node1 == NULL && node2 != NULL)
+		return 0;
+	else
+	{
+		// compare current data and the next data
+		if (node1->data == node2->data && treeComp(node1->left, node2->left) && treeComp(node1->right, node2->right))
+			return 1;
+		else
+			return 0;
+	}
+}
+/* Helper function for getLevel().
+	It returns level of the data if data is
+   present in tree, otherwise returns 0.*/
+int getLevelUtil(Node *node, int data, int level)
+{
+	if (node == NULL)
+		return 0;
+
+	if (node->data == data)
+		return level;
+
+	int downlevel = getLevelUtil(node->left,data, level + 1);
+	if (downlevel != 0)
+		return downlevel;
+
+	downlevel = getLevelUtil(node->right, data, level + 1);
+	return downlevel;
+}
+
+/* Returns level of given data value */
+int getLevel(Node *node, int data)
+{
+	return getLevelUtil(node, data, 1);
+}
+
+int getLevelBst(BST* bst1, BST* bst2, int data)
+{
+	if (bst1 == NULL || bst2 == NULL)
+	{
+		printf("trees are empty");
+		return 0;
+	}
+	if(getLevel(bst1->root,data)==getLevel(bst2->root, data))
+	return 1;
+	else return 0;
 }
